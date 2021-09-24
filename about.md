@@ -7,11 +7,10 @@ permalink: /about/
 Hi! My name is Lukas Severinghaus and I am a robotics engineering student at Arizona State University on the Polytechnic campus.
 
 I have been interested in robotics and fascinated with making things since a young age. I spend most of my free time building projects to explore things I'm interested in, and as I have entered college, I have used these projects to help build upon the knowledge I gain in my classes. My interests and focus areas are pretty varied:
-* From 2018-2020, I ran a drone based aerial photography company. I'm an FAA Part 107 certificated commercial sUAS (small Unmanned Air System) pilot.
-* I currently design and sew camping gear and EDC for myself and clients. I have sewn close to a dozen backpacks, sleeping bags, and tarps.
+* I currently intern for [W8less](https://w8less.io) doing software development for customers in the autonomous vehicle and ADAS analysis space and for internal projects around the integration of robotics with UWB based micro-positioning.
+* From 2018-2020, I ran a drone based aerial photography company, Northern Arizona Aerial Photography. I'm an FAA Part 107 certificated commercial sUAS (small Unmanned Air System) pilot.
+* I design and sew camping gear and EDC (Every Day Carry) items for myself and clients. I have sewn close to a dozen backpacks, sleeping bags, and tarps.
 * I am an FCC licensed Extra class Amateur Radio operator, callsign KK6AXQ.
-* I enjoy spending time in the outdoors, hiking, mountain biking, and skiing, and I am an Eagle Scout.
-* I also bake rustic bread and sourdough.
 
 From these interests, I have a gained a diverse skillset that continues to enable my projects, including:
 * **Project management.** I have experience organizing projects large and small from inception to completion, both by myself and with others.
