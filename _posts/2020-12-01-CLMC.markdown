@@ -1,0 +1,17 @@
+---
+layout: post
+title: "CLMC: Closed Loop Motor Controller"
+date: 2020-12-01 10:00:00 -0000
+excerpt_separator: <!--more-->
+---
+{% include image.html url="https://github.com/kk6axq/CLMC/raw/master/media/Side%20View.jpg" description="" width="75%" %}
+For a dual honors contract in EGR101, Foundations of Engineering Design Project I, and MAT265, Calculus for Engineers I, I researched, designed, and built a closed loop motor controller. This project used a PID loop to control the position, velocity, and acceleration of an attached motor. As my first foray into the world of PCB design, I used common building blocks to help simplify the design and ensure I was able to finish it within the time constraints of the semester.
+<!--more-->
+
+I chose to develop a closed loop motor controller as an exploration into the low level control in robot systems. Almost all the robots I had worked with used some sort of feedback to precisely control the motors, and I wanted to understand at a deeper level how it worked.
+
+This project was built on dual honors contracts, for EGR101 and MAT265. Honors contracts allow me to pursue a project outside the normal class format for honors credit in the course. For EGR101, I scoped that side of the project to focus on the hardware design aspects, and the basic abstraction of the software. For MAT265, I focused on the math behind PID control and the implementation of the PID algorithm and feedback systems.
+
+For simplicity of design, and to stick to familiar parts, I built the motor controller using common off the shelf parts. The motor controller I selected was an integrated module, and the microcontroller followed the configuration and layout of an Arduino Uno.
+{% include image.html url="/assets/CLMC_schematic.jpg" description="" width="75%" %}
+The project is in a finished state, and all the design files, documentation, and software can be viewed here: https://github.com/kk6axq/CLMC

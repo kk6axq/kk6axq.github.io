@@ -3,6 +3,7 @@ layout: post
 title: "Autonomous Vehicles: The Viability of Moral and Legal Agency"
 date: 2020-05-01 10:00:00 -0000
 excerpt_separator: <!--more-->
+tag: Thesis
 ---
 For the conclusion of my senior year in high school, I spent the semester developing a thesis investigating the topic of liability in autonomous vehicles. This 28 page document below was the culmination of over five months of research and examines the issue through the moral and legal sectors, advocating for a legal agency model to provide representation for autonomous vehicles.
 <!--more-->
