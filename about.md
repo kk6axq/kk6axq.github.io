@@ -20,7 +20,7 @@ From these interests, I have a gained a diverse skillset that continues to enabl
   * **Software development.** I have experience developing software in C/C++, Python, and Javascript across a variety of contexts for both personal projects and business applications and everywhere from embedded devices to the cloud.
   * **Hardware development.** I have designed, built, and tested several electrical systems including custom circuitry, PCBs, power systems, and wiring harnesses. Most of my projects use KiCAD, and that is my current EDA tool of choice.
   * **Mechanical development.** I have a fair bit of experience in mechanical design and have experience using SolidWorks to design parts for my projects.
-  * **Rapid prototyping.** I excel at getting things working together quickly, both to test that the project will work, and to achieve the project results. I have experience in 3D printing and mechanical fabrication, and will be taking a class in metal prototyping this fall semester.
+  * **Rapid prototyping.** I excel at getting things working together quickly, both to test that the project will work, and to achieve the project results. I have experience in 3D printing and mechanical fabrication and I am currently enrolled in a class on machining prototyping for metal and polymers.
 * **Integration.** As any engineer will know, when any two things come together, integration ensues. I have had experience blending diverse hardware and software, and dealing with the inevitable struggles therein, to reach my project goals.
 
 I'm always interested in collaborating with other likeminded people, feel free to reach out and let's see how we can work together!
