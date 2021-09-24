@@ -1,0 +1,27 @@
+---
+layout: post
+title: "FlipBot: An Orientation Agnostic Inspection Robot"
+date: 2021-05-05 10:00:00 -0000
+excerpt_separator: <!--more-->
+---
+{% include image.html url="https://raw.githubusercontent.com/kk6axq/FlipBot/main/media/CAD%20Render%20with%20Wheels.JPG" description="" width="75%" %}
+For an honors contract in EGR102, I designed a small two wheeled robot for inspection applications. It's designed to be able to drive right side up and upside down, and integrates sensing to automatically reverse the controls when upside down. This project was an exploration into the journey of designing a complete integrated electrical, mechanical, and software robot system.
+<!--more-->
+
+Alongside my [PowerMonitor project](/2021/05/01/PowerMonitor.html), this project served as an exploration vehicle for the complexity of integrated development. I wanted to see how much work went into designing every part of the robot from the wheels to the code and from the block diagram to the circuit boards.
+
+In addition to the broad project scope, I wanted to explore several new regions of interest:
+* Wireless communications. I developed a rechargeable wireless controller for the robot with USB charging.
+
+{% include image.html url="https://raw.githubusercontent.com/kk6axq/FlipBot/main/media/Controller%20PCB%20Render.jpg" description="Controller PCB Render" width="75%" %}
+
+* Orientation sensing. The robot integrated an MPU6050 IMU to measure the orientation of the robot and provide context sensitive control.
+* EDA and CAD integration. This project harnessed the CAD export capabilities of KiCAD to generate STEP files of the PCBs for integration into the mechanical design.
+
+Looking back, this was a rather ambitious project. I met the completion criteria for the honors contract, however the robot has not achieved full functionality. Missed steps in the design verification of the electrical system concealed compatibility issues with some of the parts and issues with the PCB production process led to some boards needing to be re-milled.
+
+{% include image.html url="https://raw.githubusercontent.com/kk6axq/FlipBot/main/media/Main%20PCB%20Render.JPG" description="Main PCB Render" width="75%" %}
+
+Over summer 2021, the hardware design issues were mitigated within the existing PCB and a new PCB was milled for the controller. There still remain some phantom issues with controller connectivity and some larger issues with the initial current draw of the motor controllers. At this point, the project is at a holding point, and may or may not see further development.
+
+All the design files, documentation, and software can be viewed on GitHub: [https://github.com/kk6axq/FlipBot](https://github.com/kk6axq/FlipBot)
