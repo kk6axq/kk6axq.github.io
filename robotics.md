@@ -64,3 +64,17 @@ GPS is referenced to earth center earth fixed (ECEF) frame.
 * Inertial frame: Fixed frame, fixed to the ground
 * Vehicle frame: Fixed to the aircraft, in the same orientation as the inertial frame. Relative to the inertial frame, there is only translation, no rotation.
 * Vehicle-1 frame: Vehicle frame, with yaw (Z axis) rotation applied. +Yaw is rotation to the right, given the NED conventions.
+* Vehicle-2 frame: Vehicle-1 frame, with pitch (Y axis) rotation applied. +Pitch is rotation up.
+* Body frame: Vehicle-2 frame, with roll (X axis) rotation applied. +Roll is rotation to the right.
+
+So the chain is:
+```
+          Translation     Yaw         Pitch        Roll
+Inertial frame -> Vehicle -> Vehicle-1 -> Vehicle-2 -> Body frame
+                           Z           Y             X
+```
+
+The body frame is the final position and orientation of the vehicle in the global frame.
+
+An example is a strapped inertial navigation system. The IMU records roll,
+pitch, and yaw in the body frame.
