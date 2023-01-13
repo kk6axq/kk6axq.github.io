@@ -1,4 +1,7 @@
-# Robotics Notes
+---
+title: Robotics Notes
+---
+
 This is my quick reference sheet of information from EGR455/456, Robotics 1/2
  at ASU.
 
@@ -77,4 +80,9 @@ Inertial frame -> Vehicle -> Vehicle-1 -> Vehicle-2 -> Body frame
 The body frame is the final position and orientation of the vehicle in the global frame.
 
 An example is a strapped inertial navigation system. The IMU records roll,
-pitch, and yaw in the body frame.
+pitch, and yaw in the body frame, this has to be transformed back into the
+inertial frame to find the position in global space.
+
+The next two frames:
+* Stability frame: vehicle position + angle of attack, so pitch?
+* Wind frame: stability frame + sideslip?
