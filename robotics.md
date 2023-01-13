@@ -85,4 +85,4 @@ inertial frame to find the position in global space.
 
 The next two frames:
 * Stability frame: vehicle position + angle of attack, so pitch?
-* Wind frame: stability frame + sideslip?
+* Wind frame: stability frame + sideslip? 
