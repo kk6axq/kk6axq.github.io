@@ -147,3 +147,4 @@ $β=sin^{-1}(\frac{v_r}{(u_r^2+v_r^2+w_r^2)^{0.5}})$
 &gamma; is the flight path angle, or the vertical angle measured from the `i` body frame axis rotated around `j`. This angle increases as the aircraft pitches up. The formula for change in height as the vehicle is climbing is `h=Vg*sin(γ)`
 
 
+[Chapter 3 continued here](./robotics/ch3.md)
