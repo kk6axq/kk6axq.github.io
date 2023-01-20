@@ -137,9 +137,9 @@ The final relation is the expression of aircraft movement relative to the surrou
 
 This allows one to calculate alpha and beta:
 
-α = tan-1(wr/ur)
+$α = tan^-1(\frac{w_r}{u_r})$
 
-β=sin-1(vr/(ur^2+vr^2+wr^2)^0.5)
+$β=sin^-1(\frac{v_r}{(u_r^2+v_r^2+w_r^2)^0.5})$
 
 ## Course and flight path angles
 &Chi; (Chi) is the course angle, the angle from north of the current groundspeed vector, about the `k` inertial axis.
