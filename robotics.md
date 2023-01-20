@@ -1,7 +1,12 @@
 ---
 title: Robotics Notes
 ---
-
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+<script type="text/javascript"
+  src="http://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 This is my quick reference sheet of information from EGR455/456, Robotics 1/2
  at ASU.
 
@@ -107,11 +112,39 @@ Quaternions do not have this singularity, and thus are more robust, albeit more
 complex. Quaternions are also easier to forward and back propagate.
 
 
-## TODO: Wind and airspeed, groundspeed.
-V<sub>a</sub>=V<sub>g</sub>-V<sub>w</sub>
+## Wind and airspeed, groundspeed.
 
-The airspeed is ground speed minus the wind speed vectors. If you're going into a headwind, you'll move slower both in total airspeed and groundspeed.
+V<sub>g</sub> is the groundspeed vector. This is the direction of movement of the vehicle in the inertial frame. Vector vg expresses this as the movement of the aircraft with regards to the inertial frame, expressed in the body frame.
+
+`Vbg = (u;v;w)`
+
+V<sub>w</sub> is the wind vector. This is the movement of the wind relative to the inertial frame, expressed in the body frame.
+
+`Vbw = (uw;vw;ww)=Rbv(Φ, Θ, ψ)(wn;we;wd)`
+
+The aircraft's velocity described in the wind frame is quite simple:
+`Vwa = (Va;0;0)`
+
+This is because the transform to wind frame already removes any angle of attack or sideslip angle, resulting in only a linear airspeed component along the `i` axis.
+
+Groundspeed is a function of both airspeed and wind speed, as seen by the following equation:
+V<sub>g</sub>=V<sub>a</sub>+V<sub>w</sub>
+
+The actual airspeed is ground speed minus the wind speed vectors. If you're going into a headwind, you'll move slower both in total airspeed and groundspeed.
+
+The final relation is the expression of aircraft movement relative to the surrounding air, as expressed in the body frame:
+`Vba = (ur;vr;wr;)=Va * (cos(α)cos(β); sin(β); sin(α)cos(β))`
+
+This allows one to calculate alpha and beta:
+
+α = tan-1(wr/ur)
+
+β=sin-1(vr/(ur^2+vr^2+wr^2)^0.5)
 
 ## Course and flight path angles
-&Chi; is the course angle, the angle from north of the current groundspeed vector, about the `k` inertial axis.
-&gamma; is the flight path angle, or the vertical angle measured from the `i` body frame axis rotated around `j`.
+&Chi; (Chi) is the course angle, the angle from north of the current groundspeed vector, about the `k` inertial axis.
+
+&gamma; is the flight path angle, or the vertical angle measured from the `i` body frame axis rotated around `j`. This angle increases as the aircraft pitches up. The formula for change in height as the vehicle is climbing is `h=Vg*sin(γ)`
+
+TeX test:
+$a=3$
