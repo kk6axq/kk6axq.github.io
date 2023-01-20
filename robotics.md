@@ -5,7 +5,7 @@ title: Robotics Notes
   MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
 </script>
 <script type="text/javascript"
-  src="http://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 This is my quick reference sheet of information from EGR455/456, Robotics 1/2
  at ASU.
