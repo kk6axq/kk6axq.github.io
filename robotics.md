@@ -99,6 +99,12 @@ The projection of the airspeed vector on the stability frame's `ij` plane forms 
 
 **Remember:** The wind to stability frame shows the &beta; rotation, for sideslip. The stability to vehicle frame shows the &alpha; rotation, for angle of attack.
 
+The updated transform chain:
+```
+          Translation     Yaw         Pitch        Roll          AoA       Sideslip
+Inertial frame -> Vehicle -> Vehicle-1 -> Vehicle-2 -> Body frame -> Stability -> Wind
+                           Z           Y             X             α            β 
+```
 
 ## Frame variables
 * &psi; (Psi) is used to represent the heading (yaw) angle.

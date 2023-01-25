@@ -7,6 +7,11 @@ title: Robotics Notes - Chapter 3
 <script type="text/javascript"
   src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
+<style>
+  .MathJax{
+    font-size: 150% !important;
+  }
+  </style>
 # Robotics II, Chapter 3
 
 If you like kinematics, GNC (guidance, navigation, and control) engineering might be for you. This is basically all they do.
@@ -50,3 +55,52 @@ Onboard sensors, gyros and accelerometers, can generate the onboard $p,q,r$ (Gyr
 ## Differentiating a vector across two reference frames
 When there's a vector in one frame which needs to be differentiated in a parent frame, the following equation applies:
 $ \frac {d}{dt_i}\bold{p}=\frac{d}{dt_b}\bold{p}+\omega_{b/i}\times \bold{p}$
+
+## TODO: Add kinematic equations of motion here
+
+## Translational dynamics
+
+$f=\frac{dV_g}{dt_i}m$
+
+or
+
+$f=m(\frac{dV_g}{dt_b}+\omega_{b/i} \times V_g)$
+
+The first component here is the derivative of magnitude. The second part is the derivative of direction.
+
+In the body coordinate frame:
+
+$f=m(\frac{dV^b_g}{dt_b}+\omega^b_{b/i} \times V^b_g)$
+
+$V^b_g=(u;v;w)$ - Body Velocities
+
+$\omega^b_{b/i}=(p;q;r)$ - Body angular velocities
+
+$f_b = (f_x;f_y;f_z)$ - Forces 
+
+Simplified equation in body frame:
+
+$(\dot u;\dot v; \dot w) = (rv-pw; pw-ru; qu-pv) + \frac{1}{m}(f_x;f_y;f_z)$
+
+## Rotation Dynamics
+
+Newton's 2nd law:
+
+$\frac{dh}{dt_i}=m$
+
+Where: $h$ is the angular momentum vector,
+$m$ is the sum of all external moments.
+Derivative is taken with regards to the intertial frame.
+
+Expressed in the body frame:
+
+$\frac{dh^b}{dt_b}+\omega^b_{b/i}\times h^b=m^b$
+
+Moments of inertia are calculated as $mr^2$. 
+Angular momentum equation:
+
+$h^b≜J\omega^b_{b/i}$
+
+$\dot \omega ^b_{b/i}=(\dot p;\dot q; \dot r)$
+
+If an aircraft across the `ik` body plane, then $J_{xy}=J_{yz}=0$
