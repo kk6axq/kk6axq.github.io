@@ -104,3 +104,14 @@ $h^b≜J\omega^b_{b/i}$
 $\dot \omega ^b_{b/i}=(\dot p;\dot q; \dot r)$
 
 If an aircraft across the `ik` body plane, then $J_{xy}=J_{yz}=0$
+
+## Quaternions
+
+A quaternion is made of a 4 element vector, where $e0, e1, e2, e3$ are scalars and $||e||=1$. $e0$ is the scalar part of the quaternion, $(e1, e2, e3)^T$ is the vector part.
+To convert between euler angles and quaternions:
+
+$\phi=atan2(2(e_0e_1 + e_2e_3), (e_0^2 + e_3^2-e_1^2-e_2^2))$
+
+$\theta=asin(2(e_0e_2-e_1e_3))$
+$\psi=atan2(2(e_0e_3+e_1e_2), (e_0^2+e_1^2-e_2^2-e_3^2))$
+
