@@ -63,6 +63,8 @@ $(\delta_e; \delta_a) = \frac{1}{2}(1 1; 1 -1)(\delta_{er};\delta_{el})$
 
 ## Aircraft dynamics
 Aircraft dynamics are typically split across latitudinal and longitudinal groups.
+
+Lateral dynamics deals with movement in the planar X, Y world (primarily roll and yaw). Longitudinal dynamics deal with movement in altitude (primarily pitch).
 ### Longitudinal forces
 Longitudinal forces act in the $ik$ plane, also known as the pitch frame. They are influenced by angle of attack, pitch rate, and elevator deflection. 
 
@@ -77,5 +79,40 @@ $F_lift=\frac{1}{2}\rho v_a^2 S [C_{L0}+C_{l\alpha} \alpha + C_{lq}\frac{c}{2V_a
 
 Side note: $C_{Lq}=\frac{\delta C_l}{\delta \frac{qc}{2V_a}}$
 
+This approach is a linear aerodynamic model. It's sufficient for small angles of attack in small scale UAVs. For larger, more complex platforms, nonlinear dynamics must be used. 
 
+The simplest linear lift and drag models are:
 
+$C_L(\alpha)=C_L0+C_{L_\alpha}\alpha$
+
+$C_D(\alpha)=C_D0+C_{D_\alpha}\alpha$
+
+In a nonlinear model, we blend a linear model and a flate plate model with a blending function.
+
+### Nonlinear model
+$C_{L_{\alpha}}$ is teh stability derivative, and is approximated by:
+
+$\frac{\pi AR}{1+\sqrt{a+(AR/2)^2}}$
+
+Where $AR=b^2/S$ is the wing aspect ration, $b$ is the wingspan, and $S$ is the wing area.
+
+The stability derivative shows if the vehicle is stable or unstable, or whether it will return to its trim state after being perturbed. 
+
+### Drag
+Drag is composed of parasitic drag (profile drag of the aircraft, surfaces, fuselage, etc) and induced drag (drag due to lift).
+
+## Control derivatives
+Some control derivatives are cross-control derivatives, meaning that they influence more than one axis simulataneously. This includes: $C_{l_{\delta r}}$ and $C_{n_{\delta a}}$
+
+## Propeller effects
+The propeller exerts a force and a moment:
+
+$f^b=(T_p;0;0)$
+
+$m^b=(Q_p;0;0)$
+
+These both depend on the air density, propeller speed, propeller diameter, aerodynamic coefficients, and advance ratio.
+
+## Wind modelling
+Wind modelling uses a white nose source fed through a transfer function to build a wind gust model. 
+This is the Dryden gust model.
