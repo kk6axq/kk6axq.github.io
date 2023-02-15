@@ -1,3 +1,14 @@
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<style>
+  .MathJax{
+    font-size: 150% !important;
+  }
+  </style>
 # Chapter 4
 This chapter looks at specifying the forces and moments that act on the body. Building on the content from chapter 3, this enables modelling how the vehicle interacts with the world.
 

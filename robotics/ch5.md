@@ -35,6 +35,10 @@ Without wind:
 
 $\dot \chi = \frac{g}{V_g}tan\phi$
 
+Thus, the turning radius is:
+
+$R=\frac{V_a^2}{g \tan\phi}$
+
 ## Trimming
 Trimming is the process of adjusting the flight control surfaces or inputs to achieve a steady state (flying straight and level with fixed wing vehicles, or not moving/staying level for quadcopters).
 
@@ -52,6 +56,33 @@ In these trim states, some state variables can be constrained:
 * $\dot u, \dot v, \dot w$ are going to be 0, because the vehicle isn't accelerating.
 * $\dot \phi, \dot \theta, \dot p, \dot q$ are all zero because the vehicle isn't rotating. 
 
-In a climb, the climb rate and climb angle are constant. Matlab's trim function can take these target states and the state equations and calculate the level curves with their solutions. 
+Basically, set derivatives to zero or a desired value, then solve the equations of motion to determine the state that achieves this.
+
+This can be done using gradient descent algorithms. In this case, the system should find local minima, not global minima, as it is not ideal to find a solution far from the current vehicle state. 
+
+In a climb, the climb rate and climb angle are constant. MATLAB's trim function can take these target states and the state equations and calculate the level curves with their solutions. 
 
 In a very tiny frame (1/1000 of a sec) the behavior of the system can be linearized. The problem is that you need to use different controllers depending on the operating region. This is where gain scheduling comes in. 
+
+
+When determining the transfer functions for a control link, like aileron input on roll, the goal is to model the system linearly with a disturbance, where the disturbance is all the linear or non-linear unmodelled dynamics. The disturbance has its own transfer function, that then combines with the actual input to feed into the linear transfer function. 
+
+```
+         Disturbance
+          ___|___
+          |T.F. |
+          |_____|
+             |
+Input -------+ --> [T.F.]
+
+```
+
+## Sideslip
+
+In no wind:
+
+$v= V_a\sin\beta$
+
+With wind:
+
+$\dot v = (V_a \cos \beta)\dot \beta$
