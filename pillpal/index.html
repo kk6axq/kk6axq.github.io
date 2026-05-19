@@ -259,6 +259,22 @@
     transition: all .2s ease;
   }
   .check:active { transform: scale(.9); }
+
+  .skip-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2px solid var(--line);
+    background: transparent;
+    display: grid; place-items: center;
+    cursor: pointer; flex-shrink: 0;
+    color: var(--ink-3);
+    transition: all .2s ease;
+    margin-right: -4px;
+  }
+  .skip-btn:active { transform: scale(.9); }
+  .skip-btn:hover { color: var(--danger-ink); border-color: var(--rose); }
+  .skip-btn svg { width: 14px; height: 14px; }
+  .dose.taken .skip-btn, .dose.skipped .skip-btn { display: none; }
+
   .dose.taken .check {
     background: var(--sage); border-color: var(--sage); color: white;
   }
@@ -267,6 +283,81 @@
   .dose.taken .name { text-decoration: line-through; text-decoration-color: var(--ink-3); }
   .dose.missed .check { border-color: var(--rose); }
   .dose.missed .dose-time { background: var(--rose-soft); color: var(--danger-ink); }
+  .dose.skipped { opacity: .55; }
+  .dose.skipped .check { border-style: dashed; }
+  .dose.skipped .dose-time { background: var(--bg-2); color: var(--ink-3); text-decoration: line-through; }
+
+  /* PRN (as-needed) card */
+  .prn-card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 14px 16px;
+    box-shadow: var(--shadow); margin-bottom: 10px;
+  }
+  .prn-top {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .prn-top .pill-icon { flex-shrink: 0; }
+  .prn-info { flex: 1; min-width: 0; }
+  .prn-info .name {
+    font-weight: 700; font-size: 16px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .prn-info .sub { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+  .prn-take {
+    flex-shrink: 0;
+    padding: 10px 16px; border-radius: 12px;
+    background: var(--primary); color: white;
+    border: none; font-family: inherit; font-weight: 700; font-size: 14px;
+    cursor: pointer; min-width: 78px;
+    box-shadow: 0 2px 6px rgba(217,119,87,.3);
+  }
+  .prn-take:active { transform: scale(.96); }
+  .prn-take.disabled, .prn-take:disabled {
+    background: var(--bg-2); color: var(--ink-3);
+    box-shadow: none; cursor: not-allowed;
+  }
+  .prn-take.waiting { background: var(--yellow); color: #6B4F1A; box-shadow: none; }
+  .prn-bottom {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: .04em;
+  }
+  .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .status-pill.ready { background: var(--sage-soft); color: var(--sage); }
+  .status-pill.waiting { background: var(--yellow-soft); color: #B9882C; }
+  [data-theme="dark"] .status-pill.waiting { color: var(--yellow); }
+  .status-pill.locked { background: var(--bg-2); color: var(--ink-2); }
+  .prn-meta { font-size: 12px; color: var(--ink-2); }
+
+  /* Type selector at top of form */
+  .type-select {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    padding: 4px; background: var(--bg-2); border-radius: 13px;
+    margin-bottom: 14px;
+  }
+  .type-opt {
+    border: none; background: transparent;
+    padding: 12px 10px; border-radius: 10px;
+    font-family: inherit; font-weight: 700; font-size: 14px;
+    color: var(--ink-2); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: background .15s, color .15s, box-shadow .15s;
+  }
+  .type-opt svg { width: 16px; height: 16px; }
+  .type-opt.on {
+    background: var(--card); color: var(--ink);
+    box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 2px 6px rgba(0,0,0,.05);
+  }
+  [data-theme="dark"] .type-opt.on {
+    box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 2px 6px rgba(0,0,0,.3);
+  }
 
   /* Empty states */
   .empty {
@@ -420,19 +511,105 @@
     cursor: pointer;
   }
 
+  /* Quick-fill schedule presets */
+  .quick-fill {
+    margin-bottom: 14px;
+    padding: 12px;
+    background: var(--bg-2);
+    border-radius: 14px;
+  }
+  .qf-lbl {
+    font-size: 11px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-2);
+    margin-bottom: 8px;
+  }
+  .qf-chips {
+    display: flex; gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px 2px 4px;
+    margin: 0 -2px 10px;
+    scrollbar-width: none;
+  }
+  .qf-chips::-webkit-scrollbar { display: none; }
+  .qf-chip {
+    flex-shrink: 0;
+    padding: 8px 14px; border-radius: 999px;
+    background: var(--card); border: 1px solid var(--line);
+    font-family: inherit; font-weight: 700; font-size: 13px;
+    color: var(--ink); cursor: pointer;
+    white-space: nowrap;
+    transition: transform .12s ease, background .15s;
+  }
+  .qf-chip:active { transform: scale(.95); background: var(--primary-soft); }
+  .qf-controls {
+    display: flex; gap: 8px;
+  }
+  .qf-mini {
+    flex: 1; min-width: 0;
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 12px; color: var(--ink-2); font-weight: 700;
+    letter-spacing: .04em; text-transform: uppercase;
+  }
+  .qf-mini input {
+    flex: 1; min-width: 0;
+    background: transparent; border: none; outline: none;
+    font-family: inherit; font-size: 15px; font-weight: 700;
+    color: var(--ink);
+    padding: 2px 0;
+    text-transform: none; letter-spacing: 0;
+  }
+  .qf-mini input[type=number] {
+    width: 40px; flex: 0 0 40px;
+    -moz-appearance: textfield;
+    text-align: center;
+  }
+  .qf-mini input[type=number]::-webkit-outer-spin-button,
+  .qf-mini input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
+  }
+
   /* Color swatches */
   .swatches {
-    display: flex; gap: 8px; flex-wrap: wrap;
+    display: flex; gap: 14px; flex-wrap: wrap;
+    padding: 6px 4px;
   }
   .swatch {
-    width: 40px; height: 40px; border-radius: 12px;
-    border: 2px solid transparent;
+    width: 48px; height: 48px; border-radius: 14px;
     cursor: pointer;
     display: grid; place-items: center;
-    color: transparent;
+    position: relative;
+    outline: 3px solid transparent;
+    outline-offset: 3px;
+    transition: outline-color .18s ease, transform .18s ease;
   }
-  .swatch.selected { border-color: var(--ink); color: white; }
-  .swatch svg { width: 16px; height: 16px; }
+  .swatch::after {
+    /* Tiny tag in the corner of unselected swatches so each one feels like a target */
+    content: ''; position: absolute; inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+    pointer-events: none;
+  }
+  .swatch svg {
+    width: 24px; height: 24px;
+    opacity: 0;
+    transform: scale(.4) rotate(-30deg);
+    transition: opacity .18s ease, transform .22s cubic-bezier(.3,1.4,.5,1);
+    stroke-width: 3.2;
+  }
+  .swatch.selected {
+    outline-color: var(--ink);
+    transform: scale(1.08);
+  }
+  .swatch.selected svg {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+  .swatch:active { transform: scale(.95); }
+  .swatch.selected:active { transform: scale(1.02); }
 
   /* Day chips */
   .day-chips {
@@ -827,8 +1004,19 @@ function getGreeting() {
   return 'Hello, night owl';
 }
 
-// Get the doses for a given date and medication
+// Get the scheduled doses for a given date and medication (PRN meds return [])
 function dosesForDay(med, dateObj) {
+  if (med.type === 'prn') return [];
+  // Creation date — doses prior to creation don't count
+  let createdMinutes = null;
+  if (med.createdAt) {
+    const created = new Date(med.createdAt);
+    const createdDay = new Date(created.getFullYear(), created.getMonth(), created.getDate());
+    if (dateObj < createdDay) return [];
+    if (+dateObj === +createdDay) {
+      createdMinutes = created.getHours() * 60 + created.getMinutes();
+    }
+  }
   // days: 'daily' or array of 0-6 (Sun..Sat)
   if (med.days !== 'daily' && Array.isArray(med.days)) {
     if (!med.days.includes(dateObj.getDay())) return [];
@@ -843,27 +1031,97 @@ function dosesForDay(med, dateObj) {
     const end = parseDateKey(med.endDate);
     if (dateObj > end) return [];
   }
-  return (med.times || []).map((t) => ({ time: t }));
+  let times = med.times || [];
+  if (createdMinutes !== null) {
+    times = times.filter((t) => {
+      const [h, mm] = t.split(':').map(Number);
+      return h * 60 + mm >= createdMinutes;
+    });
+  }
+  return times.map((t) => ({ time: t }));
 }
 
-// All scheduled (medId, time) for a given date
+// All scheduled (medId, time) for a given date, with dynamic "missed" auto-mark applied
 function scheduleForDay(dateObj) {
   const dateKey = fmtDateKey(dateObj);
   const items = [];
+  const autoMarkH = settings.autoMarkAfter || 0; // 0 = off
+  const now = new Date();
   for (const m of meds) {
     for (const d of dosesForDay(m, dateObj)) {
       const logEntry = log.find((l) =>
-        l.medId === m.id && l.scheduledISO.startsWith(dateKey) && l.scheduledISO.includes(`T${d.time}`)
+        l.medId === m.id && l.scheduledISO && l.scheduledISO.startsWith(dateKey) && l.scheduledISO.includes(`T${d.time}`)
       );
+      let status = logEntry ? logEntry.status : 'pending';
+      let autoMarked = false;
+      if (!logEntry && autoMarkH > 0) {
+        const [h, mm] = d.time.split(':').map(Number);
+        const scheduled = new Date(dateObj); scheduled.setHours(h, mm, 0, 0);
+        if ((now - scheduled) / 3600000 >= autoMarkH) {
+          status = 'missed';
+          autoMarked = true;
+        }
+      }
       items.push({
-        medId: m.id, med: m, time: d.time,
-        status: logEntry ? logEntry.status : 'pending',
+        medId: m.id, med: m, time: d.time, status, autoMarked,
         logId: logEntry ? logEntry.id : null,
         takenISO: logEntry ? logEntry.takenISO : null,
       });
     }
   }
   return items.sort((a, b) => a.time.localeCompare(b.time));
+}
+
+// --- PRN (as-needed) helpers ---
+function prnDoses(medId) {
+  return log.filter((l) => l.medId === medId && !l.scheduledISO && l.takenISO);
+}
+function lastPRNDose(medId) {
+  const arr = prnDoses(medId);
+  if (!arr.length) return null;
+  return arr.reduce((a, b) => new Date(a.takenISO) > new Date(b.takenISO) ? a : b);
+}
+function prnDosesOnDay(medId, dateObj) {
+  const key = fmtDateKey(dateObj);
+  return prnDoses(medId).filter((l) => l.takenISO.startsWith(key));
+}
+function prnStatusFor(med) {
+  const last = lastPRNDose(med.id);
+  const minMs = (med.minIntervalHours || 0) * 3600000;
+  const todayCount = prnDosesOnDay(med.id, new Date()).length;
+  const max = med.maxPerDay || 0;
+  const now = new Date();
+  let ready = true, waitMs = 0, nextAt = null;
+  if (last && minMs > 0) {
+    const elapsed = now - new Date(last.takenISO);
+    if (elapsed < minMs) {
+      ready = false;
+      waitMs = minMs - elapsed;
+      nextAt = new Date(new Date(last.takenISO).getTime() + minMs);
+    }
+  }
+  const atMax = max > 0 && todayCount >= max;
+  return { ready, atMax, last, nextAt, waitMs, todayCount, max };
+}
+function logPRNDose(medId) {
+  log.push({ id: uid(), medId, status: 'taken', takenISO: new Date().toISOString() });
+  save(LS.log, log);
+}
+function fmtAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return 'just now';
+  if (min < 60) return `${min}m ago`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return min % 60 ? `${h}h ${min % 60}m ago` : `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return `${d}d ago`;
+}
+function fmtWait(ms) {
+  const min = Math.max(1, Math.ceil(ms / 60000));
+  if (min < 60) return `${min}m`;
+  const h = Math.floor(min / 60);
+  return min % 60 ? `${h}h ${min % 60}m` : `${h}h`;
 }
 
 // Mark dose taken/untaken
@@ -899,6 +1157,15 @@ const ICON_TRASH = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" 
   <polyline points="3 6 5 6 21 6"></polyline>
   <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
   <path d="M10 11v6M14 11v6"></path><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+</svg>`;
+const ICON_X = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <line x1="6" y1="6" x2="18" y2="18"></line><line x1="6" y1="18" x2="18" y2="6"></line>
+</svg>`;
+const ICON_CLOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 14"></polyline>
+</svg>`;
+const ICON_PLUS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+  <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
 </svg>`;
 
 function pillIconEl(colorId, size = 46) {
@@ -949,14 +1216,21 @@ function renderTodayList() {
   const list = $('#today-list');
   const sched = scheduleForDay(selectedDate);
   const today = new Date(); today.setHours(0,0,0,0);
-  const isPast = +selectedDate < +today;
-  const isFuture = +selectedDate > +today;
+  const isToday = +selectedDate === +today;
 
-  $('#today-title').textContent = +selectedDate === +today ? 'Today' : fmtRelativeDay(selectedDate);
-  $('#schedule-label').textContent = +selectedDate === +today ? "Today's schedule" : `${fmtFullDate(selectedDate)}'s schedule`;
-  $('#greeting').textContent = +selectedDate === +today ? getGreeting() : 'Looking at';
+  $('#today-title').textContent = isToday ? 'Today' : fmtRelativeDay(selectedDate);
+  $('#schedule-label').textContent = isToday ? "Today's schedule" : `${fmtFullDate(selectedDate)}'s schedule`;
+  $('#greeting').textContent = isToday ? getGreeting() : 'Looking at';
 
-  if (sched.length === 0) {
+  const prnMeds = isToday ? meds.filter((m) => m.type === 'prn') : [];
+  const prnSection = prnMeds.length ? `
+    <div class="section-title" style="margin-top:0;">As needed</div>
+    <div id="prn-list">${prnMeds.map(renderPRNCardHTML).join('')}</div>
+    ${sched.length ? '<div class="section-title">Scheduled</div>' : ''}
+  ` : '';
+  if (prnMeds.length > 0) $('#schedule-label').textContent = '';
+
+  if (sched.length === 0 && prnMeds.length === 0) {
     list.innerHTML = `
       <div class="empty">
         <div class="blob">${pillIconEl('yellow', 56).replace('class="pill-icon"', 'class="pill-icon" style="background:transparent;color:#D9A23A;width:56px;height:56px;"')}</div>
@@ -964,51 +1238,222 @@ function renderTodayList() {
         <p>${meds.length ? "Nothing scheduled for this day." : "Tap the + button to add your first medication and set up reminders."}</p>
       </div>
     `;
+    $('#schedule-label').textContent = '';
     return;
   }
+  if (sched.length === 0) {
+    list.innerHTML = prnSection;
+    $('#schedule-label').textContent = '';
+    bindPRNCards();
+    return;
+  }
+
   const now = new Date();
   const nowM = now.getHours() * 60 + now.getMinutes();
 
-  list.innerHTML = sched.map((s) => {
+  const doseHTML = sched.map((s) => {
     const c = colorOf(s.med.color);
     const [hh, mm] = s.time.split(':').map(Number);
     const doseMin = hh * 60 + mm;
     let cls = '';
+    let effective = s.status;
     if (s.status === 'taken') cls = 'taken';
-    else if (+selectedDate === +today && doseMin < nowM - 15 && s.status === 'pending') cls = 'missed';
+    else if (s.status === 'skipped') cls = 'skipped';
+    else if (s.status === 'missed') cls = 'missed';
+    else if (isToday && doseMin < nowM - 15) { cls = 'missed'; effective = 'missed-display'; }
+    const showSkip = (cls === 'missed' || effective === 'missed-display') && s.status !== 'skipped' && s.status !== 'taken';
+
+    let subInfo = `<span>${escapeHTML(s.med.dosage || '1 dose')}</span>`;
+    if (s.status === 'taken' && s.takenISO) {
+      subInfo += `<span class="dot"></span><span>Taken ${new Date(s.takenISO).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>`;
+    } else if (s.status === 'skipped') {
+      subInfo += `<span class="dot"></span><span>Skipped</span>`;
+    } else if (cls === 'missed') {
+      subInfo += `<span class="dot"></span><span>${s.autoMarked ? 'Auto-marked missed' : 'Missed'}</span>`;
+    }
+
     return `
       <div class="dose ${cls}" data-med="${s.med.id}" data-time="${s.time}">
         <div class="pill-icon" style="background:${c.bg}; color:${c.fg};">${ICON_PILL}</div>
         <div class="dose-meta">
           <div class="name">${escapeHTML(s.med.name)}</div>
-          <div class="sub">
-            <span>${escapeHTML(s.med.dosage || '1 dose')}</span>
-            ${s.status === 'taken' && s.takenISO ? `<span class="dot"></span><span>Taken ${new Date(s.takenISO).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>` : ''}
-          </div>
+          <div class="sub">${subInfo}</div>
         </div>
         <div class="dose-time">${fmtTime12(s.time)}</div>
+        ${showSkip ? `<button class="skip-btn" aria-label="Mark as skipped">${ICON_X}</button>` : ''}
         <button class="check" aria-label="Mark as taken">${ICON_CHECK}</button>
       </div>
     `;
   }).join('');
 
-  // bind clicks
+  list.innerHTML = prnSection + doseHTML;
+  bindPRNCards();
+
+  // bind dose row clicks
   list.querySelectorAll('.dose').forEach((row) => {
     const medId = row.dataset.med;
     const time = row.dataset.time;
     row.querySelector('.check').addEventListener('click', (e) => {
       e.stopPropagation();
-      const sched = scheduleForDay(selectedDate);
-      const cur = sched.find((s) => s.medId === medId && s.time === time);
+      const cur = scheduleForDay(selectedDate).find((s) => s.medId === medId && s.time === time);
       const newStatus = cur && cur.status === 'taken' ? 'pending' : 'taken';
       markDose(medId, selectedDate, time, newStatus);
       renderToday();
       if (newStatus === 'taken') toast('Nice — marked taken');
     });
+    const skipBtn = row.querySelector('.skip-btn');
+    if (skipBtn) {
+      skipBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        markDose(medId, selectedDate, time, 'skipped');
+        renderToday();
+        toast('Marked as skipped');
+      });
+    }
     row.addEventListener('click', () => {
-      const sched = scheduleForDay(selectedDate);
-      const cur = sched.find((s) => s.medId === medId && s.time === time);
+      const cur = scheduleForDay(selectedDate).find((s) => s.medId === medId && s.time === time);
       openDoseSheet(cur);
+    });
+  });
+}
+
+// PRN card rendering
+function renderPRNCardHTML(med) {
+  const c = colorOf(med.color);
+  const s = prnStatusFor(med);
+  let pillCls, pillText;
+  if (s.atMax) { pillCls = 'locked'; pillText = `Daily limit (${s.todayCount}/${s.max})`; }
+  else if (!s.ready) { pillCls = 'waiting'; pillText = `Wait ${fmtWait(s.waitMs)}`; }
+  else { pillCls = 'ready'; pillText = 'Ready to take'; }
+
+  const lastText = s.last ? `Last: ${new Date(s.last.takenISO).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })} · ${fmtAgo(s.last.takenISO)}` : 'No doses yet';
+  const countText = s.max > 0 ? `${s.todayCount} of ${s.max} today` : (s.todayCount > 0 ? `${s.todayCount} today` : '');
+
+  const btnCls = s.atMax ? 'disabled' : (!s.ready ? 'waiting' : '');
+  const btnLabel = s.atMax ? 'Done' : 'Take';
+  return `
+    <div class="prn-card" data-id="${med.id}">
+      <div class="prn-top">
+        <div class="pill-icon" style="background:${c.bg}; color:${c.fg};">${ICON_PILL}</div>
+        <div class="prn-info">
+          <div class="name">${escapeHTML(med.name)}</div>
+          <div class="sub">${escapeHTML(med.dosage || 'As needed')}</div>
+        </div>
+        <button class="prn-take ${btnCls}" data-id="${med.id}" ${s.atMax ? 'disabled' : ''}>${btnLabel}</button>
+      </div>
+      <div class="prn-bottom">
+        <div class="status-pill ${pillCls}"><span class="dot"></span>${pillText}</div>
+        <div class="prn-meta">${lastText}${countText ? ' · ' + countText : ''}</div>
+      </div>
+    </div>
+  `;
+}
+
+function bindPRNCards() {
+  document.querySelectorAll('.prn-card').forEach((card) => {
+    const id = card.dataset.id;
+    const med = meds.find((m) => m.id === id);
+    if (!med) return;
+    const btn = card.querySelector('.prn-take');
+    if (btn && !btn.disabled) {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const s = prnStatusFor(med);
+        if (!s.ready) {
+          openConfirmSheet({
+            title: `Take ${med.name} now?`,
+            body: `Your last dose was ${fmtAgo(s.last.takenISO)}. Recommended wait is ${med.minIntervalHours}h (${fmtWait(s.waitMs)} remaining).`,
+            confirmLabel: 'Take anyway',
+            danger: false,
+            onConfirm: () => { logPRNDose(med.id); renderToday(); toast('Logged'); }
+          });
+        } else {
+          logPRNDose(med.id);
+          renderToday();
+          toast(`Logged ${med.name}`);
+        }
+      });
+    }
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.prn-take')) return;
+      openPRNDetail(med);
+    });
+  });
+}
+
+function openPRNDetail(med) {
+  const c = colorOf(med.color);
+  const s = prnStatusFor(med);
+  const today = new Date();
+  const todayDoses = prnDosesOnDay(med.id, today).sort((a, b) => new Date(b.takenISO) - new Date(a.takenISO));
+  const statusLine = s.atMax ? `Daily limit reached (${s.todayCount}/${s.max})`
+    : !s.ready ? `Wait ${fmtWait(s.waitMs)} before next dose`
+    : 'Ready to take';
+
+  openSheet(`
+    <div class="med-detail-hero">
+      <div class="big-pill" style="background:${c.bg}; color:${c.fg};">${ICON_PILL}</div>
+      <h3>${escapeHTML(med.name)}</h3>
+      <div class="sub">${escapeHTML(med.dosage || 'As needed')}</div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-2); margin-bottom:6px;">Status</div>
+      <div style="font-weight:600;">${statusLine}</div>
+      <div style="margin-top:4px; color:var(--ink-2); font-size:14px;">
+        Min interval: ${med.minIntervalHours || 0}h${med.maxPerDay ? ` · Max ${med.maxPerDay}/day` : ''}
+      </div>
+    </div>
+
+    ${todayDoses.length ? `
+      <div class="card">
+        <div style="font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-2); margin-bottom:8px;">Today's doses (${todayDoses.length})</div>
+        ${todayDoses.map((d, i) => `
+          <div class="row" style="padding:6px 0; ${i ? 'border-top:1px solid var(--line);' : ''}">
+            <span style="font-family:'Fraunces',serif; font-weight:500;">${new Date(d.takenISO).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
+            <span class="muted" style="margin-left:8px;">${fmtAgo(d.takenISO)}</span>
+            <span class="spacer"></span>
+            <button class="btn btn-ghost" style="width:auto; padding:6px 10px; font-size:13px;" data-undo="${d.id}">Undo</button>
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+
+    <div style="margin-top:14px;">
+      <button class="btn btn-primary" id="prn-take-now" ${s.atMax ? 'disabled' : ''}>${s.atMax ? 'Daily limit reached' : 'Take a dose now'}</button>
+      <button class="btn btn-ghost" id="prn-edit" style="margin-top:8px;">Edit medication</button>
+      <button class="btn btn-ghost" id="prn-close" style="margin-top:8px;">Close</button>
+    </div>
+  `);
+
+  $('#prn-take-now').addEventListener('click', () => {
+    if (s.atMax) return;
+    if (!s.ready) {
+      closeSheet();
+      setTimeout(() => openConfirmSheet({
+        title: `Take ${med.name} now?`,
+        body: `Last dose was ${fmtAgo(s.last.takenISO)}. Recommended wait is ${med.minIntervalHours}h.`,
+        confirmLabel: 'Take anyway',
+        onConfirm: () => { logPRNDose(med.id); renderToday(); toast('Logged'); }
+      }), 300);
+    } else {
+      logPRNDose(med.id);
+      closeSheet();
+      renderToday();
+      toast('Logged');
+    }
+  });
+  $('#prn-edit').addEventListener('click', () => { closeSheet(); setTimeout(() => openMedForm(med), 300); });
+  $('#prn-close').addEventListener('click', closeSheet);
+
+  $('#sheet').querySelectorAll('[data-undo]').forEach((b) => {
+    b.addEventListener('click', () => {
+      const id = b.dataset.undo;
+      log = log.filter((l) => l.id !== id);
+      save(LS.log, log);
+      closeSheet();
+      renderToday();
+      toast('Removed');
     });
   });
 }
@@ -1092,22 +1537,35 @@ function renderMeds() {
   }
   list.innerHTML = meds.map((m) => {
     const c = colorOf(m.color);
-    const times = (m.times || []).map(fmtTime12).join(' · ');
-    const sched = m.days === 'daily' ? 'Daily'
-      : (m.days || []).map((d) => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]).join(', ') || 'No days set';
+    let sub;
+    if (m.type === 'prn') {
+      const parts = ['As needed'];
+      if (m.minIntervalHours) parts.push(`every ${m.minIntervalHours}h min`);
+      if (m.maxPerDay) parts.push(`up to ${m.maxPerDay}/day`);
+      sub = `${escapeHTML(m.dosage || '')}${m.dosage ? ' · ' : ''}${parts.join(' · ')}`;
+    } else {
+      const times = (m.times || []).map(fmtTime12).join(' · ');
+      const sched = m.days === 'daily' ? 'Daily'
+        : (m.days || []).map((d) => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]).join(', ') || 'No days set';
+      sub = `${escapeHTML(m.dosage || '')} · ${times || 'No times'} · ${sched}`;
+    }
     return `
       <div class="med-row" data-id="${m.id}">
         <div class="pill-icon" style="background:${c.bg}; color:${c.fg}; width:50px; height:50px; border-radius:16px;">${ICON_PILL}</div>
         <div class="meta">
           <div class="name">${escapeHTML(m.name)}</div>
-          <div class="sub">${escapeHTML(m.dosage || '')} · ${times || 'No times'} · ${sched}</div>
+          <div class="sub">${sub}</div>
         </div>
         <div class="chev">${ICON_CHEV}</div>
       </div>
     `;
   }).join('');
   list.querySelectorAll('.med-row').forEach((row) => {
-    row.addEventListener('click', () => openMedDetail(row.dataset.id));
+    row.addEventListener('click', () => {
+      const m = meds.find((x) => x.id === row.dataset.id);
+      if (m && m.type === 'prn') openPRNDetail(m);
+      else openMedDetail(row.dataset.id);
+    });
   });
 }
 
@@ -1116,21 +1574,27 @@ function renderHistory() {
   const summary = $('#adherence-summary');
   const list = $('#history-list');
 
-  // 7-day adherence
+  // 7-day adherence (scheduled meds only)
   const today = new Date(); today.setHours(0,0,0,0);
-  let scheduled = 0, taken = 0;
+  let scheduled = 0, taken = 0, prnCount = 0;
   for (let i = 0; i < 7; i++) {
     const d = new Date(today); d.setDate(today.getDate() - i);
     const sch = scheduleForDay(d);
     scheduled += sch.length;
     taken += sch.filter((s) => s.status === 'taken').length;
+    for (const m of meds.filter((x) => x.type === 'prn')) {
+      prnCount += prnDosesOnDay(m.id, d).length;
+    }
   }
   const pct = scheduled ? Math.round((taken / scheduled) * 100) : 0;
+  const hasScheduled = meds.some((m) => m.type !== 'prn');
+  const hasPRN = meds.some((m) => m.type === 'prn');
   summary.innerHTML = `
     <div class="stats-row" style="margin-bottom:18px;">
-      <div class="stat-card"><div class="v">${pct}%</div><div class="l">7-day adherence</div></div>
-      <div class="stat-card"><div class="v">${taken}</div><div class="l">Doses taken</div></div>
-      <div class="stat-card"><div class="v">${scheduled - taken}</div><div class="l">Missed</div></div>
+      ${hasScheduled ? `<div class="stat-card"><div class="v">${pct}%</div><div class="l">7-day adherence</div></div>` : ''}
+      <div class="stat-card"><div class="v">${taken + prnCount}</div><div class="l">Doses taken</div></div>
+      ${hasScheduled ? `<div class="stat-card"><div class="v">${Math.max(0, scheduled - taken)}</div><div class="l">Missed</div></div>` : ''}
+      ${hasPRN && !hasScheduled ? `<div class="stat-card"><div class="v">${prnCount}</div><div class="l">As-needed</div></div>` : ''}
     </div>
   `;
 
@@ -1142,25 +1606,37 @@ function renderHistory() {
 
   let html = '';
   let anyContent = false;
+  const now = new Date();
   for (let i = 0; i < 30; i++) {
     const d = new Date(today); d.setDate(today.getDate() - i);
     const sch = scheduleForDay(d);
-    if (sch.length === 0) continue;
+    // Collect PRN doses for this day
+    const prnEntries = [];
+    for (const m of meds.filter((x) => x.type === 'prn')) {
+      for (const entry of prnDosesOnDay(m.id, d)) prnEntries.push({ entry, med: m });
+    }
+    if (sch.length === 0 && prnEntries.length === 0) continue;
     anyContent = true;
-    const dateLabel = fmtRelativeDay(d) + (i > 1 ? ` · ${d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}` : '');
-    html += `<div class="history-day"><div class="date-label">${dateLabel}</div>`;
+
+    // Merge into one sorted list (by time of day)
+    const rows = [];
     for (const s of sch) {
-      const isPast = (d < today) || (d.getTime() === today.getTime() && (() => {
-        const [h, mm] = s.time.split(':').map(Number);
-        const now = new Date();
-        return h * 60 + mm < now.getHours() * 60 + now.getMinutes() - 15;
-      })());
-      const status = s.status === 'pending' ? (isPast ? 'missed' : 'pending') : s.status;
-      const dotCls = status === 'taken' ? 'taken' : (status === 'missed' ? 'missed' : 'skipped');
-      const statusText = status === 'taken'
-        ? `Taken ${s.takenISO ? 'at ' + new Date(s.takenISO).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : ''}`
-        : status === 'missed' ? 'Missed' : 'Upcoming';
-      html += `
+      const [h, mm] = s.time.split(':').map(Number);
+      const sortKey = h * 60 + mm;
+      let displayStatus = s.status;
+      if (displayStatus === 'pending') {
+        const isPast = (d < today) || (+d === +today && sortKey < now.getHours() * 60 + now.getMinutes() - 15);
+        if (isPast) displayStatus = 'missed';
+      }
+      const dotCls = displayStatus === 'taken' ? 'taken'
+        : displayStatus === 'skipped' ? 'skipped'
+        : displayStatus === 'missed' ? 'missed' : 'skipped';
+      const statusText = displayStatus === 'taken'
+        ? `Taken${s.takenISO ? ' at ' + new Date(s.takenISO).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : ''}`
+        : displayStatus === 'missed' ? (s.autoMarked ? 'Auto-marked missed' : 'Missed')
+        : displayStatus === 'skipped' ? 'Skipped'
+        : 'Upcoming';
+      rows.push({ sortKey, html: `
         <div class="log-row">
           <div class="status-dot ${dotCls}"></div>
           <div class="info">
@@ -1169,9 +1645,27 @@ function renderHistory() {
           </div>
           <div class="time">${fmtTime12(s.time)}</div>
         </div>
-      `;
+      ` });
     }
-    html += `</div>`;
+    for (const { entry, med } of prnEntries) {
+      const takenDate = new Date(entry.takenISO);
+      const sortKey = takenDate.getHours() * 60 + takenDate.getMinutes();
+      const timeText = takenDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      rows.push({ sortKey, html: `
+        <div class="log-row">
+          <div class="status-dot taken"></div>
+          <div class="info">
+            <div class="n">${escapeHTML(med.name)}<span class="muted" style="font-weight:600; font-size:12px;"> · as needed</span></div>
+            <div class="t">${escapeHTML(med.dosage || '')} · Taken at ${timeText}</div>
+          </div>
+          <div class="time">${timeText}</div>
+        </div>
+      ` });
+    }
+    rows.sort((a, b) => a.sortKey - b.sortKey);
+
+    const dateLabel = fmtRelativeDay(d) + (i > 1 ? ` · ${d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}` : '');
+    html += `<div class="history-day"><div class="date-label">${dateLabel}</div>${rows.map((r) => r.html).join('')}</div>`;
   }
   list.innerHTML = anyContent ? html : `<div class="empty"><h3>No history yet</h3><p>Start tracking doses to build your history.</p></div>`;
 }
@@ -1223,6 +1717,17 @@ function renderSettings() {
       <button class="btn btn-ghost" id="test-notif" style="width:auto; padding:10px 14px;">Send</button>
     </div>
 
+    <div class="setting-row" style="display:block;">
+      <div class="label" style="margin-bottom: 10px;">Auto-mark untaken doses</div>
+      <div class="segment" id="automark-segment" style="grid-template-columns: repeat(4, 1fr);">
+        <button class="seg-opt ${(settings.autoMarkAfter||0)===0?'on':''}" data-v="0">Off</button>
+        <button class="seg-opt ${(settings.autoMarkAfter||0)===2?'on':''}" data-v="2">2h</button>
+        <button class="seg-opt ${(settings.autoMarkAfter||0)===4?'on':''}" data-v="4">4h</button>
+        <button class="seg-opt ${(settings.autoMarkAfter||0)===24?'on':''}" data-v="24">End&nbsp;of&nbsp;day</button>
+      </div>
+      <div class="desc" style="font-size: 13px; color: var(--ink-2); margin-top: 10px;">After this much time past a scheduled dose, treat it as missed so it stops counting as pending.</div>
+    </div>
+
     <div class="section-title">Your data</div>
 
     <div class="setting-row">
@@ -1266,6 +1771,15 @@ function renderSettings() {
       save(LS.settings, settings);
       applyTheme();
       renderSettings();
+    });
+  });
+
+  $('#automark-segment').querySelectorAll('.seg-opt').forEach((b) => {
+    b.addEventListener('click', () => {
+      settings.autoMarkAfter = parseInt(b.dataset.v, 10);
+      save(LS.settings, settings);
+      renderSettings();
+      renderToday();
     });
   });
 
@@ -1313,12 +1827,31 @@ $('#sheet-backdrop').addEventListener('click', closeSheet);
 
 // --- Add/Edit Med Form -----------------------------------------------------
 function openMedForm(existing) {
-  const m = existing || { id: uid(), name: '', dosage: '', times: ['08:00'], days: 'daily', color: 'coral', notes: '' };
+  const m = existing || {
+    id: uid(), name: '', dosage: '',
+    type: 'scheduled',
+    times: ['08:00'], days: 'daily',
+    minIntervalHours: 4, maxPerDay: 0,
+    color: 'coral', notes: ''
+  };
+  if (!m.type) m.type = 'scheduled';
   const isNew = !existing;
+  let curType = m.type;
 
   openSheet(`
     <h2>${isNew ? 'New medication' : 'Edit medication'}</h2>
-    <p class="lede">Set a name, dosage, and the times you take it.</p>
+    <p class="lede">Choose how this one's tracked, then fill in the details.</p>
+
+    <div class="type-select">
+      <button type="button" class="type-opt ${curType === 'scheduled' ? 'on' : ''}" data-t="scheduled">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Scheduled
+      </button>
+      <button type="button" class="type-opt ${curType === 'prn' ? 'on' : ''}" data-t="prn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+        As needed
+      </button>
+    </div>
 
     <label class="field">
       <span class="lbl">Name</span>
@@ -1330,19 +1863,50 @@ function openMedForm(existing) {
       <input class="input" id="f-dosage" placeholder="e.g. 1 tablet, 500 mg" value="${escapeAttr(m.dosage)}" autocomplete="off" />
     </label>
 
-    <div class="field">
-      <span class="lbl">Reminder times</span>
-      <div class="times-list" id="f-times"></div>
-      <button class="add-time" id="f-add-time">+ Add another time</button>
+    <div id="f-scheduled-fields" style="${curType === 'prn' ? 'display:none;' : ''}">
+      <div class="field">
+        <span class="lbl">Reminder times</span>
+
+        <div class="quick-fill">
+          <div class="qf-lbl">Quick fill</div>
+          <div class="qf-chips">
+            <button class="qf-chip" data-qf="1x" type="button">Once daily</button>
+            <button class="qf-chip" data-qf="2x" type="button">Twice daily</button>
+            <button class="qf-chip" data-qf="3x" type="button">3× daily</button>
+            <button class="qf-chip" data-qf="4x" type="button">4× daily</button>
+            <button class="qf-chip" data-qf="every" type="button">Every N hrs</button>
+          </div>
+          <div class="qf-controls">
+            <label class="qf-mini">Start <input type="time" id="qf-start" value="08:00" /></label>
+            <label class="qf-mini">Every <input type="number" id="qf-interval" min="1" max="23" value="6" />h</label>
+          </div>
+        </div>
+
+        <div class="times-list" id="f-times"></div>
+        <button class="add-time" id="f-add-time" type="button">+ Add another time</button>
+      </div>
+
+      <div class="field">
+        <span class="lbl">Days</span>
+        <div class="row" style="margin-bottom:10px; gap:8px;">
+          <button type="button" class="day-chip ${m.days === 'daily' ? 'on' : ''}" id="f-daily" style="flex:1;">Every day</button>
+          <button type="button" class="day-chip ${m.days !== 'daily' ? 'on' : ''}" id="f-custom" style="flex:1;">Specific days</button>
+        </div>
+        <div class="day-chips" id="f-days" style="${m.days === 'daily' ? 'display:none;' : ''}"></div>
+      </div>
     </div>
 
-    <div class="field">
-      <span class="lbl">Days</span>
-      <div class="row" style="margin-bottom:10px; gap:8px;">
-        <button class="day-chip ${m.days === 'daily' ? 'on' : ''}" id="f-daily" style="flex:1;">Every day</button>
-        <button class="day-chip ${m.days !== 'daily' ? 'on' : ''}" id="f-custom" style="flex:1;">Specific days</button>
-      </div>
-      <div class="day-chips" id="f-days" style="${m.days === 'daily' ? 'display:none;' : ''}"></div>
+    <div id="f-prn-fields" style="${curType !== 'prn' ? 'display:none;' : ''}">
+      <label class="field">
+        <span class="lbl">Minimum hours between doses</span>
+        <input class="input" id="f-prn-interval" type="number" min="0" max="24" step="0.5" value="${m.minIntervalHours || 4}" />
+        <small class="hint">You'll be told when it's safe to take again.</small>
+      </label>
+      <label class="field">
+        <span class="lbl">Max doses per day (optional)</span>
+        <input class="input" id="f-prn-max" type="number" min="0" max="24" value="${m.maxPerDay || ''}" placeholder="No limit" />
+        <small class="hint">Leave blank for no limit.</small>
+      </label>
     </div>
 
     <div class="field">
@@ -1378,6 +1942,37 @@ function openMedForm(existing) {
   }
   renderTimes();
   $('#f-add-time').addEventListener('click', () => { times.push('12:00'); renderTimes(); });
+
+  // Quick-fill presets
+  function genTimes(preset, startHHMM, intervalHrs) {
+    const [sh, sm] = startHHMM.split(':').map(Number);
+    if (Number.isNaN(sh)) return [];
+    const startMin = sh * 60 + sm;
+    let count, intervalMin;
+    if (preset === '1x')      { count = 1; intervalMin = 24 * 60; }
+    else if (preset === '2x') { count = 2; intervalMin = 12 * 60; }
+    else if (preset === '3x') { count = 3; intervalMin = 8 * 60; }
+    else if (preset === '4x') { count = 4; intervalMin = 6 * 60; }
+    else {
+      intervalMin = Math.max(1, intervalHrs) * 60;
+      count = Math.max(1, Math.ceil(24 * 60 / intervalMin));
+    }
+    const out = [];
+    for (let i = 0; i < count; i++) {
+      const min = (startMin + i * intervalMin) % (24 * 60);
+      out.push(`${pad2(Math.floor(min / 60))}:${pad2(min % 60)}`);
+    }
+    return [...new Set(out)].sort();
+  }
+  $$('.qf-chip').forEach((b) => {
+    b.addEventListener('click', () => {
+      const start = $('#qf-start').value || '08:00';
+      const interval = Math.max(1, Math.min(23, parseInt($('#qf-interval').value, 10) || 6));
+      times = genTimes(b.dataset.qf, start, interval);
+      renderTimes();
+      toast(`Set ${times.length} ${times.length === 1 ? 'time' : 'times'}`);
+    });
+  });
 
   // Days
   let days = m.days === 'daily' ? 'daily' : [...m.days];
@@ -1425,28 +2020,55 @@ function openMedForm(existing) {
     });
   });
 
+  // Type toggle
+  $$('.type-opt').forEach((b) => {
+    b.addEventListener('click', () => {
+      curType = b.dataset.t;
+      $$('.type-opt').forEach((x) => x.classList.toggle('on', x.dataset.t === curType));
+      $('#f-scheduled-fields').style.display = curType === 'prn' ? 'none' : '';
+      $('#f-prn-fields').style.display = curType === 'prn' ? '' : 'none';
+    });
+  });
+
   // Save
   $('#f-save').addEventListener('click', () => {
     const name = $('#f-name').value.trim();
     if (!name) { toast('Please enter a name'); return; }
-    if (times.length === 0) { toast('Add at least one time'); return; }
-    if (Array.isArray(days) && days.length === 0) { toast('Pick at least one day'); return; }
-    const updated = {
-      id: m.id, name,
-      dosage: $('#f-dosage').value.trim(),
-      times: [...new Set(times)].sort(),
-      days, color: selColor,
-      notes: $('#f-notes').value.trim(),
-      createdAt: m.createdAt || new Date().toISOString(),
-    };
+
+    let updated;
+    if (curType === 'prn') {
+      const interval = parseFloat($('#f-prn-interval').value) || 0;
+      const max = parseInt($('#f-prn-max').value, 10) || 0;
+      if (interval < 0 || interval > 24) { toast('Interval must be 0–24 hours'); return; }
+      updated = {
+        id: m.id, name, type: 'prn',
+        dosage: $('#f-dosage').value.trim(),
+        minIntervalHours: interval,
+        maxPerDay: max > 0 ? max : 0,
+        color: selColor,
+        notes: $('#f-notes').value.trim(),
+        createdAt: m.createdAt || new Date().toISOString(),
+      };
+    } else {
+      if (times.length === 0) { toast('Add at least one time'); return; }
+      if (Array.isArray(days) && days.length === 0) { toast('Pick at least one day'); return; }
+      updated = {
+        id: m.id, name, type: 'scheduled',
+        dosage: $('#f-dosage').value.trim(),
+        times: [...new Set(times)].sort(),
+        days, color: selColor,
+        notes: $('#f-notes').value.trim(),
+        createdAt: m.createdAt || new Date().toISOString(),
+      };
+    }
+
     const idx = meds.findIndex((x) => x.id === updated.id);
     if (idx === -1) meds.push(updated); else meds[idx] = updated;
     save(LS.meds, meds);
     closeSheet();
     toast(isNew ? 'Medication added' : 'Saved');
     renderAll();
-    if (isNew && !settings.notifications && Notification.permission === 'default') {
-      // gentle nudge
+    if (isNew && curType === 'scheduled' && !settings.notifications && Notification.permission === 'default') {
       setTimeout(() => { renderPermissionBanner(); }, 400);
     }
   });
@@ -1699,6 +2321,10 @@ applyTheme();
 renderAll();
 tickReminders();
 setInterval(tickReminders, 30 * 1000);
+// Refresh the Today view periodically so PRN wait-timers and auto-marked statuses stay current
+setInterval(() => {
+  if (!document.hidden && $('#view-today').classList.contains('active')) renderToday();
+}, 30 * 1000);
 // Re-check when tab regains focus (catches missed ticks when app was backgrounded briefly)
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) { renderToday(); tickReminders(); }

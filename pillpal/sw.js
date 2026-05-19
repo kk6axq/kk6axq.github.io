@@ -1,5 +1,5 @@
 // Pillpal service worker
-const CACHE = 'pillpal-v2';
+const CACHE = 'pillpal-v4';
 const ASSETS = [
   './',
   './index.html',
