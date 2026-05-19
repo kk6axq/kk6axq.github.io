@@ -1711,6 +1711,14 @@ function renderSettings() {
 
     <div class="setting-row">
       <div>
+        <div class="label">Background reminders</div>
+        <div class="desc">${HAS_TRIGGERS ? 'Scheduled by your OS — fire even when the app is closed.' : 'Currently fire only while the app is open. Tap for help.'}</div>
+      </div>
+      <button class="btn btn-ghost" id="bg-help" style="width:auto; padding:10px 14px;">${HAS_TRIGGERS ? 'Active' : 'Help'}</button>
+    </div>
+
+    <div class="setting-row">
+      <div>
         <div class="label">Test notification</div>
         <div class="desc">Send yourself one right now to check it works.</div>
       </div>
@@ -1789,7 +1797,8 @@ function renderSettings() {
       toast('Reminders paused');
     } else { enableNotifications(); }
   });
-  $('#test-notif').addEventListener('click', () => fireNotification('Test reminder', 'If you can read this, reminders are working.', 'test'));
+  $('#test-notif').addEventListener('click', () => fireNotification('Test reminder', 'If you can read this, reminders are working.', 'pillpal-test'));
+  $('#bg-help').addEventListener('click', () => openBackgroundHelpSheet());
   $('#export-btn').addEventListener('click', exportData);
   $('#import-btn').addEventListener('click', importData);
   $('#clear-btn').addEventListener('click', () => {
@@ -2163,6 +2172,72 @@ function openConfirmSheet({ title, body, confirmLabel, danger, onConfirm }) {
   $('#c-cancel').addEventListener('click', closeSheet);
 }
 
+function openBackgroundHelpSheet() {
+  const ua = navigator.userAgent;
+  const isAndroid = /Android/i.test(ua);
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  openSheet(`
+    <h2>Background reminders</h2>
+    <p class="lede">Why notifications might not fire when the app is closed, and how to fix it.</p>
+
+    <div class="card">
+      <div style="font-weight:700; margin-bottom:6px;">Current status on this device</div>
+      <div style="color:var(--ink-2); font-size:14px;">
+        Notification Triggers API: <strong style="color:${HAS_TRIGGERS ? 'var(--sage)' : 'var(--danger-ink)'};">${HAS_TRIGGERS ? 'available ✓' : 'not available'}</strong><br>
+        Installed to home screen: <strong>${isStandalone ? 'yes ✓' : 'no'}</strong><br>
+        Service worker: <strong>${('serviceWorker' in navigator) ? 'active ✓' : 'not supported'}</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:700; margin-bottom:6px;">The short version</div>
+      <p style="margin:0 0 8px; font-size:14px; color:var(--ink-2);">
+        Because this is a static site with no backend, the only way the browser can fire a notification at an exact future time is through the OS-level <em>Notification Triggers</em> scheduler.
+      </p>
+      <p style="margin:0; font-size:14px; color:var(--ink-2);">
+        When this is active, scheduled reminders fire on Android even with the app closed and the screen off. Without it, reminders only fire while the app is open.
+      </p>
+    </div>
+
+    ${isAndroid && !HAS_TRIGGERS ? `
+      <div class="card" style="background:var(--yellow-soft); border-color:var(--banner-warn-border);">
+        <div style="font-weight:700; margin-bottom:8px; color:var(--banner-warn-ink);">Enable on Android Chrome</div>
+        <ol style="margin:0; padding-left:20px; font-size:14px; color:var(--banner-warn-ink);">
+          <li>Open a new Chrome tab.</li>
+          <li>Go to <strong>chrome://flags</strong>.</li>
+          <li>Search for <strong>experimental web platform features</strong>.</li>
+          <li>Set it to <strong>Enabled</strong> and tap Relaunch.</li>
+          <li>Come back to this app and re-enable reminders.</li>
+        </ol>
+        <p style="margin:10px 0 0; font-size:13px; color:var(--banner-warn-ink);">
+          You can also paste this directly in the address bar:<br>
+          <code style="user-select:all;">chrome://flags/#enable-experimental-web-platform-features</code>
+        </p>
+      </div>
+    ` : ''}
+
+    ${isIOS ? `
+      <div class="card">
+        <div style="font-weight:700; margin-bottom:6px;">On iPhone</div>
+        <p style="margin:0; font-size:14px; color:var(--ink-2);">
+          iOS doesn't support Notification Triggers at all. Reminders only fire while the app is in the foreground, or for a brief window after closing. For reliable background reminders on iOS, this app would need a Web Push backend.
+        </p>
+      </div>
+    ` : ''}
+
+    <div class="card">
+      <div style="font-weight:700; margin-bottom:6px;">The fully reliable solution</div>
+      <p style="margin:0; font-size:14px; color:var(--ink-2);">
+        Real background pushes (no flags, all platforms, including iOS Lock Screen) require a server using the Web Push protocol. That's outside what a static-only site can do. If you want me to walk through setting up a tiny free serverless backend (Cloudflare Workers + cron) for this app, let me know.
+      </p>
+    </div>
+
+    <button class="btn btn-ghost" id="bg-close" style="margin-top:14px;">Close</button>
+  `);
+  $('#bg-close').addEventListener('click', closeSheet);
+}
+
 // --- Notifications ---------------------------------------------------------
 async function enableNotifications() {
   if (!('Notification' in window)) {
@@ -2176,59 +2251,170 @@ async function enableNotifications() {
   if (perm === 'granted') {
     settings.notifications = true; save(LS.settings, settings);
     toast('Reminders are on');
-    fireNotification('Reminders enabled', "You'll get a gentle nudge at dose times.", 'enabled');
+    fireNotification('Reminders enabled', "You'll get a gentle nudge at dose times.", 'pillpal-enabled');
+    scheduleTriggeredNotifications();
   } else if (perm === 'denied') {
     toast('Notifications were blocked');
   }
   renderAll();
 }
 
-function fireNotification(title, body, tag) {
+const HAS_TRIGGERS = 'Notification' in window && 'showTrigger' in Notification.prototype;
+
+function fireNotification(title, body, tag, doseData) {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  const opts = { body, tag, icon: 'icon-192.png', badge: 'icon-192.png' };
+  const isDoseReminder = !!(doseData && doseData.medId);
   if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage({ type: 'NOTIFY', title, body, tag });
+    navigator.serviceWorker.controller.postMessage({ type: 'NOTIFY', title, body, tag, doseData, withActions: isDoseReminder });
   } else {
-    try { new Notification(title, opts); } catch (e) { /* ignore */ }
+    try {
+      new Notification(title, { body, tag, icon: 'icon-192.png', badge: 'icon-192.png', requireInteraction: isDoseReminder });
+    } catch (e) { /* ignore */ }
   }
 }
 
-// Periodic check — fires notifications for doses due in the next minute
-function tickReminders() {
+// Pre-schedule notifications via the OS notification scheduler.
+// Works on Android Chrome when the Notification Triggers flag is enabled.
+// On browsers without support, silently does nothing (foreground tick handles it).
+async function scheduleTriggeredNotifications() {
+  if (!HAS_TRIGGERS) return 0;
+  if (!('serviceWorker' in navigator)) return 0;
+  if (!settings.notifications || Notification.permission !== 'granted') return 0;
+  let reg;
+  try { reg = await navigator.serviceWorker.ready; } catch { return 0; }
+
+  // Cancel all our previously-scheduled triggers; we'll re-add fresh ones
+  try {
+    const existing = await reg.getNotifications({ includeTriggered: true });
+    for (const n of existing) {
+      if (n.tag && n.tag.startsWith('pillpal-dose-')) n.close();
+    }
+  } catch { /* ignore */ }
+
+  const now = Date.now();
+  const horizon = now + 48 * 3600 * 1000;
+  let count = 0;
+  for (const m of meds) {
+    if (m.type === 'prn') continue;
+    for (let off = 0; off <= 2; off++) {
+      const day = new Date(); day.setHours(0,0,0,0); day.setDate(day.getDate() + off);
+      const dateKey = fmtDateKey(day);
+      for (const d of dosesForDay(m, day)) {
+        const [hh, mm] = d.time.split(':').map(Number);
+        const fireAt = new Date(day); fireAt.setHours(hh, mm, 0, 0);
+        const ts = fireAt.getTime();
+        if (ts <= now + 5000 || ts > horizon) continue; // skip past + extremely-soon
+        // Skip if already actioned
+        const logEntry = log.find((l) => l.medId === m.id && l.scheduledISO === `${dateKey}T${d.time}:00`);
+        if (logEntry && logEntry.status !== 'pending') continue;
+
+        const tag = `pillpal-dose-${m.id}-${dateKey}-${d.time}`;
+        try {
+          await reg.showNotification(`Time for ${m.name}`, {
+            body: `${m.dosage || '1 dose'} · ${fmtTime12(d.time)}`,
+            tag, icon: 'icon-192.png', badge: 'icon-192.png',
+            vibrate: [120, 60, 120],
+            requireInteraction: true,
+            showTrigger: new TimestampTrigger(ts),
+            data: { url: './index.html', medId: m.id, time: d.time, dateKey, isDose: true },
+            actions: [
+              { action: 'taken', title: '✓ Took it' },
+              { action: 'snooze', title: 'Snooze 10m' },
+            ],
+          });
+          count++;
+        } catch (e) { console.warn('scheduleTriggered failed', e); }
+      }
+    }
+  }
+  return count;
+}
+
+// Periodic foreground check — covers the catch-up window when the app is open
+async function tickReminders() {
   if (!settings.notifications || Notification.permission !== 'granted') return;
   const now = new Date();
   const dateKey = fmtDateKey(now);
+  const CATCH_UP_HOURS = 4;
+
+  let swReg = null;
+  if ('serviceWorker' in navigator) {
+    try { swReg = await navigator.serviceWorker.ready; } catch {}
+  }
+
   for (const m of meds) {
+    if (m.type === 'prn') continue;
     if (!dosesForDay(m, now).length) continue;
     for (const t of m.times) {
       const [h, mm] = t.split(':').map(Number);
       const due = new Date(now); due.setHours(h, mm, 0, 0);
-      const diff = (due - now) / 1000; // seconds
+      const diffSec = (due - now) / 1000;
       const key = `${m.id}|${dateKey}|${t}`;
-      // already notified
       if (notified[key]) continue;
-      // already taken
       const logEntry = log.find((l) => l.medId === m.id && l.scheduledISO === `${dateKey}T${t}:00`);
       if (logEntry && logEntry.status !== 'pending') continue;
-      // fire when within 30s before to 60s after the scheduled time
-      if (diff <= 30 && diff >= -60) {
-        fireNotification(
-          `Time for ${m.name}`,
-          `${m.dosage || '1 dose'} · ${fmtTime12(t)}`,
-          key
-        );
-        notified[key] = Date.now();
-        save(LS.notified, notified);
+      // Fire window: 30s before to 4h after the scheduled time (catch-up on app open)
+      if (diffSec > 30 || diffSec < -CATCH_UP_HOURS * 3600) continue;
+
+      const tag = `pillpal-dose-${m.id}-${dateKey}-${t}`;
+
+      // If an OS-scheduled trigger is pending or already firing for this dose, don't double-notify
+      if (swReg) {
+        try {
+          const all = await swReg.getNotifications({ tag, includeTriggered: true });
+          if (all.length > 0) {
+            notified[key] = Date.now(); save(LS.notified, notified);
+            continue;
+          }
+        } catch {}
       }
+
+      fireNotification(`Time for ${m.name}`, `${m.dosage || '1 dose'} · ${fmtTime12(t)}`, tag, {
+        medId: m.id, time: t, dateKey
+      });
+      notified[key] = Date.now();
+      save(LS.notified, notified);
     }
   }
-  // Garbage-collect notified entries older than 3 days
+
+  // GC entries older than 3 days
   const cutoff = Date.now() - 3 * 86400000;
   let changed = false;
   for (const k of Object.keys(notified)) {
     if (notified[k] < cutoff) { delete notified[k]; changed = true; }
   }
   if (changed) save(LS.notified, notified);
+}
+
+// Handle dose actions from notification taps (Service Worker → page postMessage)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', (e) => {
+    const d = e.data || {};
+    if (d.type === 'DOSE_ACTION' && d.action === 'taken' && d.medId && d.dateKey && d.time) {
+      markDose(d.medId, parseDateKey(d.dateKey), d.time, 'taken');
+      renderAll();
+      toast('Marked taken');
+      scheduleTriggeredNotifications();
+    } else if (d.type === 'DOSE_ACTION' && d.action === 'snooze') {
+      toast('Snoozed for 10 minutes');
+    } else if (d.type === 'SYNC_REFRESH') {
+      scheduleTriggeredNotifications();
+    }
+  });
+}
+
+// If the SW opened a new window with a hash payload (no live client to receive postMessage),
+// pick up the action from the URL.
+function handleNotificationActionFromURL() {
+  const m = location.hash.match(/^#dose=([^|]+)\|([^|]+)\|([^|]+)\|(taken|skipped)$/);
+  if (!m) return;
+  history.replaceState(null, '', location.pathname);
+  const [, medId, dateKey, time, action] = m;
+  try {
+    markDose(medId, parseDateKey(dateKey), time, action);
+    toast(`Marked ${action}`);
+    scheduleTriggeredNotifications();
+  } catch {}
 }
 
 // --- Data: export / import / clear ----------------------------------------
@@ -2277,6 +2463,14 @@ $('#fab-add').addEventListener('click', () => openMedForm(null));
 // --- Misc ------------------------------------------------------------------
 function renderAll() {
   renderToday(); renderMeds(); renderHistory(); renderSettings();
+  scheduleSoon();
+}
+
+let _schedT;
+function scheduleSoon() {
+  if (!HAS_TRIGGERS) return;
+  clearTimeout(_schedT);
+  _schedT = setTimeout(() => { scheduleTriggeredNotifications().catch(() => {}); }, 400);
 }
 
 let toastT;
@@ -2318,9 +2512,27 @@ darkMQ.addEventListener('change', () => {
 
 // --- Boot ------------------------------------------------------------------
 applyTheme();
+handleNotificationActionFromURL();
 renderAll();
 tickReminders();
 setInterval(tickReminders, 30 * 1000);
+
+// Best-effort: register Periodic Background Sync so the SW gets occasionally woken up
+// to re-schedule notifications. Browser controls timing (often 12h minimum). No-op
+// if unsupported or not granted.
+(async () => {
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    if ('periodicSync' in reg && 'permissions' in navigator) {
+      const status = await navigator.permissions.query({ name: 'periodic-background-sync' });
+      if (status.state === 'granted') {
+        try { await reg.periodicSync.register('pillpal-refresh', { minInterval: 12 * 3600 * 1000 }); }
+        catch (e) { /* ignore */ }
+      }
+    }
+  } catch (e) { /* ignore */ }
+})();
 // Refresh the Today view periodically so PRN wait-timers and auto-marked statuses stay current
 setInterval(() => {
   if (!document.hidden && $('#view-today').classList.contains('active')) renderToday();
