@@ -1,0 +1,1708 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<meta name="theme-color" content="#FAF6F0" media="(prefers-color-scheme: light)" id="meta-theme-light" />
+<meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)" id="meta-theme-dark" />
+<meta name="color-scheme" content="light dark" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Pillpal" />
+<meta name="description" content="A gentle medication tracker with reminders." />
+<title>Pillpal</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #FAF6F0;
+    --bg-2: #F3ECE2;
+    --card: #FFFFFF;
+    --ink: #2D2520;
+    --ink-2: #7A6B5E;
+    --ink-3: #B5A89C;
+    --line: #EAE0D2;
+    --primary: #D97757;
+    --primary-ink: #B85C3D;
+    --primary-soft: #FCE7DD;
+    --yellow: #F5C76A;
+    --yellow-soft: #FDF1D6;
+    --sage: #7FA88F;
+    --sage-soft: #E2EEDF;
+    --sky: #8FB8C9;
+    --sky-soft: #DEEAEF;
+    --lilac: #B7A4C7;
+    --lilac-soft: #ECE4F2;
+    --rose: #D98F94;
+    --rose-soft: #F6DEDF;
+    --shadow: 0 1px 2px rgba(70,46,28,.04), 0 8px 24px rgba(70,46,28,.06);
+    --shadow-lg: 0 4px 12px rgba(70,46,28,.06), 0 24px 48px rgba(70,46,28,.10);
+    --radius: 18px;
+    --radius-lg: 24px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+    /* Semantic */
+    --tabs-bg: rgba(255,255,255,.85);
+    --banner-warn-border: #F0DBA8;
+    --banner-warn-ink: #6B4F1A;
+    --banner-info-border: #BFD4DC;
+    --banner-info-ink: #3D6675;
+    --danger-ink: #A8525A;
+    --blob-1: var(--primary-soft);
+    --blob-2: var(--yellow-soft);
+  }
+
+  [data-theme="dark"] {
+    --bg: #1A1614;
+    --bg-2: #221C18;
+    --card: #2A231E;
+    --ink: #F2EAE0;
+    --ink-2: #A89B8E;
+    --ink-3: #6B5F54;
+    --line: #3A3128;
+    --primary: #E8956C;
+    --primary-ink: #F0A88A;
+    --primary-soft: #3D2A22;
+    --yellow: #F5C76A;
+    --yellow-soft: #3A2F1A;
+    --sage: #8FB89F;
+    --sage-soft: #1F2D24;
+    --sky: #8FB8C9;
+    --sky-soft: #1E2B30;
+    --lilac: #B7A4C7;
+    --lilac-soft: #2A2330;
+    --rose: #D98F94;
+    --rose-soft: #322023;
+    --shadow: 0 1px 2px rgba(0,0,0,.2), 0 8px 24px rgba(0,0,0,.35);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,.3), 0 24px 48px rgba(0,0,0,.45);
+
+    --tabs-bg: rgba(26,22,20,.85);
+    --banner-warn-border: #5A4624;
+    --banner-warn-ink: #EBC97A;
+    --banner-info-border: #345560;
+    --banner-info-ink: #9BC5D4;
+    --danger-ink: #E89AA1;
+    --blob-1: #3D2A22;
+    --blob-2: #2D2517;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior-y: contain; }
+  body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* Decorative background blobs for warmth */
+  body::before, body::after {
+    content: '';
+    position: fixed; pointer-events: none; z-index: 0;
+    width: 60vw; height: 60vw; border-radius: 50%;
+    filter: blur(80px); opacity: .35;
+  }
+  body::before { top: -20vw; right: -20vw; background: var(--blob-1); }
+  body::after { bottom: -25vw; left: -25vw; background: var(--blob-2); }
+
+  #app {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    padding-top: var(--safe-top);
+    padding-bottom: calc(96px + var(--safe-bottom));
+    max-width: 560px; margin: 0 auto;
+  }
+
+  /* Header */
+  header.top {
+    padding: 22px 22px 8px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+  }
+  header.top .hello {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--ink-2);
+    letter-spacing: .02em;
+    margin-bottom: 2px;
+  }
+  header.top h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-variation-settings: 'opsz' 144, 'SOFT' 100;
+    font-size: 30px;
+    line-height: 1.1;
+    margin: 0;
+    letter-spacing: -.01em;
+  }
+  header.top .icon-btn {
+    width: 44px; height: 44px; border-radius: 14px;
+    background: var(--card); border: 1px solid var(--line);
+    display: grid; place-items: center;
+    box-shadow: var(--shadow); cursor: pointer;
+    color: var(--ink-2);
+  }
+  header.top .icon-btn:active { transform: scale(.95); }
+
+  /* Page transitions */
+  .view { display: none; padding: 12px 18px 16px; animation: rise .35s ease both; }
+  .view.active { display: block; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    box-shadow: var(--shadow);
+  }
+  .card + .card { margin-top: 12px; }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--ink-2);
+    margin: 18px 4px 10px;
+  }
+
+  /* Today summary */
+  .day-strip {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 6px; margin: 10px 0 18px;
+  }
+  .day-cell {
+    aspect-ratio: 1 / 1.25;
+    border-radius: 14px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .day-cell .dow { font-size: 11px; color: var(--ink-2); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+  .day-cell .dom { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; margin-top: 2px; }
+  .day-cell.today {
+    background: var(--ink); color: var(--bg); border-color: var(--ink);
+  }
+  .day-cell.today .dow { color: rgba(255,255,255,.7); }
+  .day-cell.has-doses::after {
+    content: ''; width: 4px; height: 4px; border-radius: 50%;
+    background: var(--primary); margin-top: 4px;
+  }
+  .day-cell.today.has-doses::after { background: var(--yellow); }
+
+  /* Dose item */
+  .dose {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: transform .15s ease;
+  }
+  .dose + .dose { margin-top: 10px; }
+  .dose:active { transform: scale(.99); }
+
+  .pill-icon {
+    width: 46px; height: 46px; border-radius: 14px;
+    display: grid; place-items: center;
+    background: var(--primary-soft);
+    flex-shrink: 0;
+    position: relative;
+  }
+  .pill-icon svg { width: 26px; height: 26px; }
+
+  .dose-meta { flex: 1; min-width: 0; }
+  .dose-meta .name {
+    font-weight: 700; font-size: 16px; color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .dose-meta .sub {
+    font-size: 13px; color: var(--ink-2); margin-top: 2px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .dose-meta .sub .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-3); }
+
+  .dose-time {
+    font-family: 'Fraunces', serif;
+    font-weight: 500; font-size: 15px;
+    color: var(--ink);
+    background: var(--bg-2);
+    padding: 6px 10px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .check {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2px solid var(--line);
+    background: transparent;
+    display: grid; place-items: center;
+    cursor: pointer; flex-shrink: 0;
+    color: transparent;
+    transition: all .2s ease;
+  }
+  .check:active { transform: scale(.9); }
+  .dose.taken .check {
+    background: var(--sage); border-color: var(--sage); color: white;
+  }
+  .dose.taken .pill-icon { opacity: .55; }
+  .dose.taken .name, .dose.taken .sub, .dose.taken .dose-time { opacity: .6; }
+  .dose.taken .name { text-decoration: line-through; text-decoration-color: var(--ink-3); }
+  .dose.missed .check { border-color: var(--rose); }
+  .dose.missed .dose-time { background: var(--rose-soft); color: var(--danger-ink); }
+
+  /* Empty states */
+  .empty {
+    text-align: center; padding: 48px 24px;
+    color: var(--ink-2);
+  }
+  .empty .blob {
+    width: 110px; height: 110px; margin: 0 auto 16px;
+    background: var(--yellow-soft); border-radius: 50%;
+    display: grid; place-items: center;
+    position: relative;
+  }
+  .empty .blob::before {
+    content: ''; position: absolute; inset: -8px;
+    border-radius: 50%; background: var(--primary-soft);
+    z-index: -1; transform: translate(8px, 8px);
+  }
+  .empty .blob svg { width: 56px; height: 56px; }
+  .empty h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500; font-size: 22px; color: var(--ink); margin: 0 0 6px;
+  }
+  .empty p { margin: 0; font-size: 15px; }
+
+  /* Medications list */
+  .med-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius);
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .med-row:active { transform: scale(.99); }
+  .med-row .pill-icon { width: 50px; height: 50px; border-radius: 16px; }
+  .med-row .meta { flex: 1; min-width: 0; }
+  .med-row .meta .name { font-weight: 700; font-size: 16px; }
+  .med-row .meta .sub { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+  .med-row .chev { color: var(--ink-3); }
+
+  /* FAB */
+  .fab {
+    position: fixed; right: max(18px, env(safe-area-inset-right));
+    bottom: calc(96px + var(--safe-bottom));
+    width: 60px; height: 60px; border-radius: 50%;
+    background: var(--primary); color: white;
+    border: none;
+    box-shadow: 0 8px 20px rgba(217,119,87,.45);
+    display: grid; place-items: center;
+    cursor: pointer;
+    z-index: 30;
+  }
+  .fab:active { transform: scale(.93); }
+  .fab svg { width: 24px; height: 24px; }
+
+  /* Bottom tabs */
+  nav.tabs {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: var(--tabs-bg);
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    border-top: 1px solid var(--line);
+    padding: 8px 8px calc(8px + var(--safe-bottom));
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    z-index: 40;
+  }
+  nav.tabs button {
+    background: none; border: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; padding: 8px 4px;
+    color: var(--ink-3); cursor: pointer;
+    font-family: inherit; font-size: 11px; font-weight: 700;
+    letter-spacing: .02em;
+    border-radius: 14px;
+    transition: color .2s;
+  }
+  nav.tabs button svg { width: 24px; height: 24px; }
+  nav.tabs button.active { color: var(--primary); }
+  nav.tabs button:active { background: var(--bg-2); }
+
+  /* Sheet (bottom modal) */
+  .sheet-backdrop {
+    position: fixed; inset: 0; background: rgba(45,37,32,.4);
+    opacity: 0; pointer-events: none; transition: opacity .25s;
+    z-index: 50; backdrop-filter: blur(2px);
+  }
+  .sheet-backdrop.open { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: var(--bg);
+    border-top-left-radius: 28px; border-top-right-radius: 28px;
+    padding: 8px 20px calc(24px + var(--safe-bottom));
+    transform: translateY(100%); transition: transform .35s cubic-bezier(.2,.7,.2,1);
+    max-height: 92vh; overflow-y: auto;
+    max-width: 560px; margin: 0 auto;
+    box-shadow: 0 -16px 40px rgba(70,46,28,.18);
+  }
+  .sheet.open { transform: translateY(0); }
+  .sheet .grabber {
+    width: 44px; height: 5px; border-radius: 3px;
+    background: var(--ink-3); opacity: .4;
+    margin: 6px auto 14px;
+  }
+  .sheet h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500; font-size: 24px;
+    margin: 0 0 6px;
+  }
+  .sheet .lede { color: var(--ink-2); margin: 0 0 18px; font-size: 14px; }
+
+  /* Forms */
+  label.field { display: block; margin-bottom: 14px; }
+  label.field > .lbl {
+    display: block;
+    font-size: 12px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-2); margin-bottom: 6px;
+  }
+  .input, select, textarea {
+    width: 100%; padding: 14px 14px; font-size: 16px;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px;
+    font-family: inherit; color: var(--ink);
+    -webkit-appearance: none; appearance: none;
+  }
+  .input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-soft);
+  }
+  textarea { min-height: 70px; resize: vertical; }
+
+  .times-list { display: flex; flex-direction: column; gap: 8px; }
+  .time-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .time-row input[type=time] {
+    flex: 1; padding: 12px 14px; font-size: 16px;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; font-family: inherit; color: var(--ink);
+  }
+  .time-row .remove-time {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: var(--rose-soft); color: #A8525A;
+    border: none; display: grid; place-items: center;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .add-time {
+    margin-top: 8px; background: transparent;
+    border: 1px dashed var(--ink-3); color: var(--ink-2);
+    padding: 10px; border-radius: 12px; width: 100%;
+    font-family: inherit; font-size: 14px; font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Color swatches */
+  .swatches {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .swatch {
+    width: 40px; height: 40px; border-radius: 12px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: grid; place-items: center;
+    color: transparent;
+  }
+  .swatch.selected { border-color: var(--ink); color: white; }
+  .swatch svg { width: 16px; height: 16px; }
+
+  /* Day chips */
+  .day-chips {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
+  }
+  .day-chip {
+    padding: 10px 0; border-radius: 12px; text-align: center;
+    background: var(--card); border: 1px solid var(--line);
+    font-weight: 700; font-size: 12px; cursor: pointer;
+    color: var(--ink-2);
+  }
+  .day-chip.on {
+    background: var(--ink); color: var(--bg); border-color: var(--ink);
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-family: inherit; font-size: 16px; font-weight: 700;
+    border: none; cursor: pointer;
+    -webkit-appearance: none;
+  }
+  .btn-primary {
+    background: var(--primary); color: white;
+    box-shadow: 0 4px 12px rgba(217,119,87,.3);
+    width: 100%;
+  }
+  .btn-primary:active { transform: scale(.98); }
+  .btn-ghost {
+    background: var(--bg-2); color: var(--ink); width: 100%;
+  }
+  .btn-danger {
+    background: var(--rose-soft); color: var(--danger-ink); width: 100%;
+  }
+  .btn-row { display: flex; gap: 10px; margin-top: 8px; }
+
+  /* Settings */
+  .setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); margin-bottom: 10px;
+  }
+  .setting-row .label { font-weight: 600; }
+  .setting-row .desc { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+  .setting-row > div:first-child { flex: 1; padding-right: 12px; }
+
+  /* Toggle */
+  .toggle {
+    width: 50px; height: 30px; border-radius: 30px;
+    background: var(--line);
+    position: relative; cursor: pointer;
+    transition: background .2s; flex-shrink: 0;
+  }
+  .toggle::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 24px; height: 24px; border-radius: 50%; background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,.15);
+    transition: transform .2s;
+  }
+  .toggle.on { background: var(--sage); }
+  .toggle.on::after { transform: translateX(20px); }
+
+  /* Segmented control (theme picker) */
+  .segment {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 4px; padding: 4px;
+    background: var(--bg-2); border-radius: 13px;
+  }
+  .seg-opt {
+    border: none; background: transparent;
+    padding: 10px 8px; border-radius: 10px;
+    font-family: inherit; font-weight: 700; font-size: 14px;
+    color: var(--ink-2); cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    transition: background .2s, color .2s, box-shadow .2s;
+  }
+  .seg-opt svg { width: 16px; height: 16px; }
+  .seg-opt.on {
+    background: var(--card); color: var(--ink);
+    box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
+  }
+  [data-theme="dark"] .seg-opt.on {
+    box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 2px 6px rgba(0,0,0,.3);
+  }
+
+  /* History */
+  .history-day { margin-bottom: 18px; }
+  .history-day .date-label {
+    font-family: 'Fraunces', serif;
+    font-weight: 500; font-size: 14px; color: var(--ink-2);
+    margin: 0 4px 8px; letter-spacing: .04em;
+  }
+  .log-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+  }
+  .log-row .status-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .log-row .status-dot.taken { background: var(--sage); }
+  .log-row .status-dot.missed { background: var(--rose); }
+  .log-row .status-dot.skipped { background: var(--ink-3); }
+  .log-row .info { flex: 1; min-width: 0; }
+  .log-row .info .n { font-weight: 700; font-size: 14px; }
+  .log-row .info .t { font-size: 12px; color: var(--ink-2); margin-top: 1px; }
+  .log-row .time {
+    font-family: 'Fraunces', serif; font-size: 13px;
+    color: var(--ink-2);
+  }
+
+  /* Banners */
+  .banner {
+    padding: 14px 16px;
+    border-radius: 16px;
+    margin-bottom: 14px;
+    background: var(--yellow-soft);
+    border: 1px solid var(--banner-warn-border);
+    display: flex; align-items: center; gap: 12px;
+    color: var(--banner-warn-ink);
+  }
+  .banner.banner-info {
+    background: var(--sky-soft);
+    border-color: var(--banner-info-border);
+    color: var(--banner-info-ink);
+  }
+  .banner .x {
+    background: none; border: none; color: currentColor; cursor: pointer;
+    opacity: .6; padding: 4px;
+  }
+  .banner-body { flex: 1; }
+  .banner-body .t { font-weight: 700; font-size: 14px; }
+  .banner-body .d { font-size: 13px; margin-top: 2px; }
+  .banner-body button.cta {
+    margin-top: 8px;
+    background: var(--banner-warn-ink); color: var(--yellow-soft);
+    border: none; padding: 8px 14px; border-radius: 10px;
+    font-family: inherit; font-weight: 700; font-size: 13px;
+    cursor: pointer;
+  }
+  .banner.banner-info .cta {
+    background: var(--banner-info-ink); color: var(--sky-soft);
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; left: 50%; bottom: calc(110px + var(--safe-bottom));
+    transform: translate(-50%, 20px);
+    background: var(--ink); color: var(--bg);
+    padding: 12px 18px; border-radius: 14px;
+    font-size: 14px; font-weight: 600;
+    opacity: 0; pointer-events: none;
+    transition: all .25s;
+    z-index: 100;
+    box-shadow: var(--shadow-lg);
+    max-width: 86%;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* Stats row */
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 14px 12px; text-align: center;
+  }
+  .stat-card .v {
+    font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: 22px; color: var(--ink);
+  }
+  .stat-card .l { font-size: 11px; color: var(--ink-2); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
+
+  /* Med detail */
+  .med-detail-hero {
+    text-align: center; padding: 8px 8px 16px;
+  }
+  .med-detail-hero .big-pill {
+    width: 86px; height: 86px; margin: 0 auto 12px;
+    border-radius: 26px; display: grid; place-items: center;
+    background: var(--primary-soft);
+  }
+  .med-detail-hero .big-pill svg { width: 44px; height: 44px; }
+  .med-detail-hero h3 {
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 26px; margin: 0;
+  }
+  .med-detail-hero .sub { color: var(--ink-2); font-size: 14px; margin-top: 4px; }
+
+  /* Utility */
+  .row { display: flex; align-items: center; gap: 10px; }
+  .spacer { flex: 1; }
+  .muted { color: var(--ink-2); }
+  small.hint { display: block; font-size: 12px; color: var(--ink-2); margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- TODAY VIEW -->
+  <section id="view-today" class="view active">
+    <header class="top">
+      <div>
+        <div class="hello" id="greeting">Good morning</div>
+        <h1 id="today-title">Today</h1>
+      </div>
+      <button class="icon-btn" id="open-settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </header>
+
+    <div style="padding: 4px 18px 8px;">
+      <div id="permission-banner"></div>
+      <div id="ios-install-banner"></div>
+
+      <div class="day-strip" id="day-strip"></div>
+
+      <div class="stats-row" id="today-stats"></div>
+
+      <div class="section-title" id="schedule-label">Today's schedule</div>
+      <div id="today-list"></div>
+    </div>
+  </section>
+
+  <!-- MEDS VIEW -->
+  <section id="view-meds" class="view">
+    <header class="top">
+      <div>
+        <div class="hello">Your routine</div>
+        <h1>Medications</h1>
+      </div>
+    </header>
+    <div id="meds-list"></div>
+  </section>
+
+  <!-- HISTORY VIEW -->
+  <section id="view-history" class="view">
+    <header class="top">
+      <div>
+        <div class="hello">Looking back</div>
+        <h1>History</h1>
+      </div>
+    </header>
+    <div id="adherence-summary"></div>
+    <div id="history-list"></div>
+  </section>
+
+  <!-- SETTINGS VIEW -->
+  <section id="view-settings" class="view">
+    <header class="top">
+      <div>
+        <div class="hello">Preferences</div>
+        <h1>Settings</h1>
+      </div>
+    </header>
+    <div id="settings-list"></div>
+  </section>
+
+  <!-- FAB -->
+  <button class="fab" id="fab-add" aria-label="Add medication">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+  </button>
+
+  <!-- Bottom tabs -->
+  <nav class="tabs">
+    <button class="active" data-tab="today">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12L12 4l9 8"></path><path d="M5 10v10h14V10"></path>
+      </svg>
+      Today
+    </button>
+    <button data-tab="meds">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-35 12 12)"></rect>
+        <line x1="9" y1="6" x2="15" y2="18" transform="rotate(-35 12 12)"></line>
+      </svg>
+      Meds
+    </button>
+    <button data-tab="history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"></circle>
+        <polyline points="12 7 12 12 15 14"></polyline>
+      </svg>
+      History
+    </button>
+    <button data-tab="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" y1="7" x2="20" y2="7"></line>
+        <line x1="4" y1="12" x2="20" y2="12"></line>
+        <line x1="4" y1="17" x2="14" y2="17"></line>
+      </svg>
+      More
+    </button>
+  </nav>
+</div>
+
+<!-- Sheet backdrop & sheet -->
+<div class="sheet-backdrop" id="sheet-backdrop"></div>
+<div class="sheet" id="sheet"></div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ========================================================================
+ * Pillpal — local-only medication tracker PWA
+ * ====================================================================== */
+
+// --- Storage ---------------------------------------------------------------
+const LS = {
+  meds: 'pillpal.meds',
+  log: 'pillpal.log',           // { id, medId, scheduledISO, takenISO|null, status }
+  settings: 'pillpal.settings', // { notifications, dismissed: {} }
+  notified: 'pillpal.notified', // map of "medId|YYYY-MM-DD|HH:mm" -> true
+};
+
+function load(key, fallback) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch { return fallback; }
+}
+function save(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+let meds = load(LS.meds, []);
+let log = load(LS.log, []);
+let settings = load(LS.settings, { notifications: false, dismissed: {} });
+let notified = load(LS.notified, {});
+
+// --- Color palette ---------------------------------------------------------
+const PALETTE = [
+  { id: 'coral',  bg: '#FCE7DD', fg: '#D97757' },
+  { id: 'yellow', bg: '#FDF1D6', fg: '#D9A23A' },
+  { id: 'sage',   bg: '#E2EEDF', fg: '#7FA88F' },
+  { id: 'sky',    bg: '#DEEAEF', fg: '#5E8FA3' },
+  { id: 'lilac',  bg: '#ECE4F2', fg: '#9D86B0' },
+  { id: 'rose',   bg: '#F6DEDF', fg: '#C97078' },
+];
+const colorOf = (id) => PALETTE.find((p) => p.id === id) || PALETTE[0];
+
+// --- Helpers ---------------------------------------------------------------
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+const uid = () => 'id_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+const pad2 = (n) => String(n).padStart(2, '0');
+
+function fmtDateKey(d) {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+function parseDateKey(k) {
+  const [y, m, d] = k.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+function fmtTime12(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  const am = h < 12;
+  const h12 = ((h + 11) % 12) + 1;
+  return `${h12}:${pad2(m)} ${am ? 'AM' : 'PM'}`;
+}
+function fmtRelativeDay(d) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(d); target.setHours(0,0,0,0);
+  const diff = Math.round((target - today) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === -1) return 'Yesterday';
+  if (diff === 1) return 'Tomorrow';
+  return target.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+}
+function fmtFullDate(d) {
+  return d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+}
+
+// "selectedDate" is the date the user is currently viewing (defaults to today)
+let selectedDate = new Date();
+selectedDate.setHours(0,0,0,0);
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 5) return 'Hello, night owl';
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  if (h < 21) return 'Good evening';
+  return 'Hello, night owl';
+}
+
+// Get the doses for a given date and medication
+function dosesForDay(med, dateObj) {
+  // days: 'daily' or array of 0-6 (Sun..Sat)
+  if (med.days !== 'daily' && Array.isArray(med.days)) {
+    if (!med.days.includes(dateObj.getDay())) return [];
+  }
+  // start date check
+  if (med.startDate) {
+    const start = parseDateKey(med.startDate);
+    if (dateObj < start) return [];
+  }
+  // end date check
+  if (med.endDate) {
+    const end = parseDateKey(med.endDate);
+    if (dateObj > end) return [];
+  }
+  return (med.times || []).map((t) => ({ time: t }));
+}
+
+// All scheduled (medId, time) for a given date
+function scheduleForDay(dateObj) {
+  const dateKey = fmtDateKey(dateObj);
+  const items = [];
+  for (const m of meds) {
+    for (const d of dosesForDay(m, dateObj)) {
+      const logEntry = log.find((l) =>
+        l.medId === m.id && l.scheduledISO.startsWith(dateKey) && l.scheduledISO.includes(`T${d.time}`)
+      );
+      items.push({
+        medId: m.id, med: m, time: d.time,
+        status: logEntry ? logEntry.status : 'pending',
+        logId: logEntry ? logEntry.id : null,
+        takenISO: logEntry ? logEntry.takenISO : null,
+      });
+    }
+  }
+  return items.sort((a, b) => a.time.localeCompare(b.time));
+}
+
+// Mark dose taken/untaken
+function markDose(medId, dateObj, time, status) {
+  const dateKey = fmtDateKey(dateObj);
+  const scheduledISO = `${dateKey}T${time}:00`;
+  const existing = log.findIndex((l) => l.medId === medId && l.scheduledISO === scheduledISO);
+  if (status === 'pending') {
+    if (existing !== -1) log.splice(existing, 1);
+  } else {
+    const entry = {
+      id: existing === -1 ? uid() : log[existing].id,
+      medId, scheduledISO, status,
+      takenISO: status === 'taken' ? new Date().toISOString() : null,
+    };
+    if (existing === -1) log.push(entry); else log[existing] = entry;
+  }
+  save(LS.log, log);
+}
+
+// --- SVG icons -------------------------------------------------------------
+const ICON_PILL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="2" y="9" width="20" height="6" rx="3" transform="rotate(-35 12 12)"></rect>
+  <line x1="7" y1="5" x2="17" y2="19" transform="rotate(-35 12 12)"></line>
+</svg>`;
+const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="5 12 10 17 19 7"></polyline>
+</svg>`;
+const ICON_CHEV = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="9 6 15 12 9 18"></polyline>
+</svg>`;
+const ICON_TRASH = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="3 6 5 6 21 6"></polyline>
+  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+  <path d="M10 11v6M14 11v6"></path><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+</svg>`;
+
+function pillIconEl(colorId, size = 46) {
+  const c = colorOf(colorId);
+  return `<div class="pill-icon" style="background:${c.bg}; color:${c.fg}; width:${size}px; height:${size}px;">${ICON_PILL}</div>`;
+}
+
+// --- Rendering: Today view -------------------------------------------------
+function renderDayStrip() {
+  const strip = $('#day-strip');
+  strip.innerHTML = '';
+  const today = new Date(); today.setHours(0,0,0,0);
+  // Show today + previous 3 + next 3 (7 total) — week-of view starting Sunday is also OK,
+  // but Huckleberry-style: show the current week centered around today
+  const start = new Date(today);
+  start.setDate(today.getDate() - today.getDay()); // Sunday
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start); d.setDate(start.getDate() + i);
+    const isToday = +d === +today;
+    const isSelected = +d === +selectedDate;
+    const has = scheduleForDay(d).length > 0;
+    const dow = ['S','M','T','W','T','F','S'][d.getDay()];
+    const cell = document.createElement('div');
+    cell.className = 'day-cell' + (isSelected ? ' today' : '') + (has ? ' has-doses' : '');
+    cell.innerHTML = `<div class="dow">${dow}</div><div class="dom">${d.getDate()}</div>`;
+    cell.addEventListener('click', () => {
+      selectedDate = d;
+      renderToday();
+    });
+    strip.appendChild(cell);
+  }
+}
+
+function renderTodayStats() {
+  const sched = scheduleForDay(selectedDate);
+  const taken = sched.filter((s) => s.status === 'taken').length;
+  const total = sched.length;
+  const pending = sched.filter((s) => s.status === 'pending').length;
+  const pct = total ? Math.round((taken / total) * 100) : 0;
+  $('#today-stats').innerHTML = `
+    <div class="stat-card"><div class="v">${taken}/${total}</div><div class="l">Taken</div></div>
+    <div class="stat-card"><div class="v">${pending}</div><div class="l">Remaining</div></div>
+    <div class="stat-card"><div class="v">${pct}%</div><div class="l">Complete</div></div>
+  `;
+}
+
+function renderTodayList() {
+  const list = $('#today-list');
+  const sched = scheduleForDay(selectedDate);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const isPast = +selectedDate < +today;
+  const isFuture = +selectedDate > +today;
+
+  $('#today-title').textContent = +selectedDate === +today ? 'Today' : fmtRelativeDay(selectedDate);
+  $('#schedule-label').textContent = +selectedDate === +today ? "Today's schedule" : `${fmtFullDate(selectedDate)}'s schedule`;
+  $('#greeting').textContent = +selectedDate === +today ? getGreeting() : 'Looking at';
+
+  if (sched.length === 0) {
+    list.innerHTML = `
+      <div class="empty">
+        <div class="blob">${pillIconEl('yellow', 56).replace('class="pill-icon"', 'class="pill-icon" style="background:transparent;color:#D9A23A;width:56px;height:56px;"')}</div>
+        <h3>${meds.length ? 'A quiet day' : 'No medications yet'}</h3>
+        <p>${meds.length ? "Nothing scheduled for this day." : "Tap the + button to add your first medication and set up reminders."}</p>
+      </div>
+    `;
+    return;
+  }
+  const now = new Date();
+  const nowM = now.getHours() * 60 + now.getMinutes();
+
+  list.innerHTML = sched.map((s) => {
+    const c = colorOf(s.med.color);
+    const [hh, mm] = s.time.split(':').map(Number);
+    const doseMin = hh * 60 + mm;
+    let cls = '';
+    if (s.status === 'taken') cls = 'taken';
+    else if (+selectedDate === +today && doseMin < nowM - 15 && s.status === 'pending') cls = 'missed';
+    return `
+      <div class="dose ${cls}" data-med="${s.med.id}" data-time="${s.time}">
+        <div class="pill-icon" style="background:${c.bg}; color:${c.fg};">${ICON_PILL}</div>
+        <div class="dose-meta">
+          <div class="name">${escapeHTML(s.med.name)}</div>
+          <div class="sub">
+            <span>${escapeHTML(s.med.dosage || '1 dose')}</span>
+            ${s.status === 'taken' && s.takenISO ? `<span class="dot"></span><span>Taken ${new Date(s.takenISO).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>` : ''}
+          </div>
+        </div>
+        <div class="dose-time">${fmtTime12(s.time)}</div>
+        <button class="check" aria-label="Mark as taken">${ICON_CHECK}</button>
+      </div>
+    `;
+  }).join('');
+
+  // bind clicks
+  list.querySelectorAll('.dose').forEach((row) => {
+    const medId = row.dataset.med;
+    const time = row.dataset.time;
+    row.querySelector('.check').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const sched = scheduleForDay(selectedDate);
+      const cur = sched.find((s) => s.medId === medId && s.time === time);
+      const newStatus = cur && cur.status === 'taken' ? 'pending' : 'taken';
+      markDose(medId, selectedDate, time, newStatus);
+      renderToday();
+      if (newStatus === 'taken') toast('Nice — marked taken');
+    });
+    row.addEventListener('click', () => {
+      const sched = scheduleForDay(selectedDate);
+      const cur = sched.find((s) => s.medId === medId && s.time === time);
+      openDoseSheet(cur);
+    });
+  });
+}
+
+function renderToday() {
+  renderDayStrip();
+  renderTodayStats();
+  renderTodayList();
+  renderPermissionBanner();
+  renderInstallBanner();
+}
+
+// --- Banners --------------------------------------------------------------
+function renderPermissionBanner() {
+  const wrap = $('#permission-banner');
+  wrap.innerHTML = '';
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') return;
+  if (Notification.permission === 'denied') return;
+  if (settings.dismissed.notif) return;
+  if (meds.length === 0) return;
+
+  wrap.innerHTML = `
+    <div class="banner">
+      <div style="font-size:22px;">🔔</div>
+      <div class="banner-body">
+        <div class="t">Enable reminders</div>
+        <div class="d">Get a gentle nudge when it's time for a dose.</div>
+        <button class="cta" id="banner-enable">Turn on notifications</button>
+      </div>
+      <button class="x" aria-label="Dismiss" id="banner-dismiss">✕</button>
+    </div>
+  `;
+  $('#banner-enable').addEventListener('click', enableNotifications);
+  $('#banner-dismiss').addEventListener('click', () => {
+    settings.dismissed.notif = true; save(LS.settings, settings); renderPermissionBanner();
+  });
+}
+
+function renderInstallBanner() {
+  const wrap = $('#ios-install-banner');
+  wrap.innerHTML = '';
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (isStandalone) return;
+  if (settings.dismissed.install) return;
+  if (!isIOS) return; // Android gets the native install prompt elsewhere
+
+  wrap.innerHTML = `
+    <div class="banner banner-info">
+      <div style="font-size:22px;">📲</div>
+      <div class="banner-body">
+        <div class="t">Install Pillpal</div>
+        <div class="d">Tap the Share button in Safari, then "Add to Home Screen." Required on iPhone for reminders to work in the background.</div>
+      </div>
+      <button class="x" id="install-dismiss" aria-label="Dismiss">✕</button>
+    </div>
+  `;
+  $('#install-dismiss').addEventListener('click', () => {
+    settings.dismissed.install = true; save(LS.settings, settings); renderInstallBanner();
+  });
+}
+
+// --- Meds view -------------------------------------------------------------
+function renderMeds() {
+  const list = $('#meds-list');
+  if (meds.length === 0) {
+    list.innerHTML = `
+      <div class="empty">
+        <div class="blob">
+          <svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#D97757" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="9" width="20" height="6" rx="3" transform="rotate(-35 12 12)"></rect>
+            <line x1="7" y1="5" x2="17" y2="19" transform="rotate(-35 12 12)"></line>
+          </svg>
+        </div>
+        <h3>No medications yet</h3>
+        <p>Add your first medication to start tracking.</p>
+      </div>
+    `;
+    return;
+  }
+  list.innerHTML = meds.map((m) => {
+    const c = colorOf(m.color);
+    const times = (m.times || []).map(fmtTime12).join(' · ');
+    const sched = m.days === 'daily' ? 'Daily'
+      : (m.days || []).map((d) => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]).join(', ') || 'No days set';
+    return `
+      <div class="med-row" data-id="${m.id}">
+        <div class="pill-icon" style="background:${c.bg}; color:${c.fg}; width:50px; height:50px; border-radius:16px;">${ICON_PILL}</div>
+        <div class="meta">
+          <div class="name">${escapeHTML(m.name)}</div>
+          <div class="sub">${escapeHTML(m.dosage || '')} · ${times || 'No times'} · ${sched}</div>
+        </div>
+        <div class="chev">${ICON_CHEV}</div>
+      </div>
+    `;
+  }).join('');
+  list.querySelectorAll('.med-row').forEach((row) => {
+    row.addEventListener('click', () => openMedDetail(row.dataset.id));
+  });
+}
+
+// --- History view ----------------------------------------------------------
+function renderHistory() {
+  const summary = $('#adherence-summary');
+  const list = $('#history-list');
+
+  // 7-day adherence
+  const today = new Date(); today.setHours(0,0,0,0);
+  let scheduled = 0, taken = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today); d.setDate(today.getDate() - i);
+    const sch = scheduleForDay(d);
+    scheduled += sch.length;
+    taken += sch.filter((s) => s.status === 'taken').length;
+  }
+  const pct = scheduled ? Math.round((taken / scheduled) * 100) : 0;
+  summary.innerHTML = `
+    <div class="stats-row" style="margin-bottom:18px;">
+      <div class="stat-card"><div class="v">${pct}%</div><div class="l">7-day adherence</div></div>
+      <div class="stat-card"><div class="v">${taken}</div><div class="l">Doses taken</div></div>
+      <div class="stat-card"><div class="v">${scheduled - taken}</div><div class="l">Missed</div></div>
+    </div>
+  `;
+
+  // Group by day (last 30 days)
+  if (meds.length === 0) {
+    list.innerHTML = `<div class="empty"><h3>Nothing here yet</h3><p>Your dose history will appear here as you track meds.</p></div>`;
+    return;
+  }
+
+  let html = '';
+  let anyContent = false;
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(today); d.setDate(today.getDate() - i);
+    const sch = scheduleForDay(d);
+    if (sch.length === 0) continue;
+    anyContent = true;
+    const dateLabel = fmtRelativeDay(d) + (i > 1 ? ` · ${d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}` : '');
+    html += `<div class="history-day"><div class="date-label">${dateLabel}</div>`;
+    for (const s of sch) {
+      const isPast = (d < today) || (d.getTime() === today.getTime() && (() => {
+        const [h, mm] = s.time.split(':').map(Number);
+        const now = new Date();
+        return h * 60 + mm < now.getHours() * 60 + now.getMinutes() - 15;
+      })());
+      const status = s.status === 'pending' ? (isPast ? 'missed' : 'pending') : s.status;
+      const dotCls = status === 'taken' ? 'taken' : (status === 'missed' ? 'missed' : 'skipped');
+      const statusText = status === 'taken'
+        ? `Taken ${s.takenISO ? 'at ' + new Date(s.takenISO).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : ''}`
+        : status === 'missed' ? 'Missed' : 'Upcoming';
+      html += `
+        <div class="log-row">
+          <div class="status-dot ${dotCls}"></div>
+          <div class="info">
+            <div class="n">${escapeHTML(s.med.name)}</div>
+            <div class="t">${escapeHTML(s.med.dosage || '')} · ${statusText}</div>
+          </div>
+          <div class="time">${fmtTime12(s.time)}</div>
+        </div>
+      `;
+    }
+    html += `</div>`;
+  }
+  list.innerHTML = anyContent ? html : `<div class="empty"><h3>No history yet</h3><p>Start tracking doses to build your history.</p></div>`;
+}
+
+// --- Settings view ---------------------------------------------------------
+function renderSettings() {
+  const list = $('#settings-list');
+  const notifPerm = ('Notification' in window) ? Notification.permission : 'unsupported';
+  const notifOn = settings.notifications && notifPerm === 'granted';
+  const theme = settings.theme || 'auto';
+  list.innerHTML = `
+    <div class="setting-row" style="display:block;">
+      <div class="label" style="margin-bottom: 10px;">Theme</div>
+      <div class="segment" id="theme-segment">
+        <button class="seg-opt ${theme==='auto'?'on':''}" data-v="auto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Auto
+        </button>
+        <button class="seg-opt ${theme==='light'?'on':''}" data-v="light">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7" y2="7"/><line x1="17" y1="17" x2="19.1" y2="19.1"/><line x1="4.9" y1="19.1" x2="7" y2="17"/><line x1="17" y1="7" x2="19.1" y2="4.9"/></svg>
+          Light
+        </button>
+        <button class="seg-opt ${theme==='dark'?'on':''}" data-v="dark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+          Dark
+        </button>
+      </div>
+      <div class="desc" style="font-size: 13px; color: var(--ink-2); margin-top: 10px;">Auto follows your device's system setting.</div>
+    </div>
+
+    <div class="setting-row">
+      <div>
+        <div class="label">Reminders</div>
+        <div class="desc">${
+          notifPerm === 'unsupported' ? 'Not supported on this device.' :
+          notifPerm === 'denied' ? 'Blocked. Enable notifications for this site in your browser settings.' :
+          notifPerm === 'granted' ? 'Local notifications at your scheduled times.' :
+          'Tap to turn on local notifications.'
+        }</div>
+      </div>
+      <div class="toggle ${notifOn ? 'on' : ''}" id="toggle-notif"></div>
+    </div>
+
+    <div class="setting-row">
+      <div>
+        <div class="label">Test notification</div>
+        <div class="desc">Send yourself one right now to check it works.</div>
+      </div>
+      <button class="btn btn-ghost" id="test-notif" style="width:auto; padding:10px 14px;">Send</button>
+    </div>
+
+    <div class="section-title">Your data</div>
+
+    <div class="setting-row">
+      <div>
+        <div class="label">Export</div>
+        <div class="desc">Download a JSON backup of your meds and history.</div>
+      </div>
+      <button class="btn btn-ghost" id="export-btn" style="width:auto; padding:10px 14px;">Export</button>
+    </div>
+
+    <div class="setting-row">
+      <div>
+        <div class="label">Import</div>
+        <div class="desc">Restore from a backup file.</div>
+      </div>
+      <button class="btn btn-ghost" id="import-btn" style="width:auto; padding:10px 14px;">Import</button>
+    </div>
+
+    <div class="setting-row" style="background:var(--rose-soft); border-color:var(--rose-soft);">
+      <div>
+        <div class="label" style="color:var(--danger-ink);">Clear everything</div>
+        <div class="desc" style="color:var(--danger-ink); opacity:.85;">Delete all medications and history.</div>
+      </div>
+      <button class="btn btn-danger" id="clear-btn" style="width:auto; padding:10px 14px;">Clear</button>
+    </div>
+
+    <div class="section-title">About</div>
+    <div class="card">
+      <div style="font-family:'Fraunces',serif; font-weight:500; font-size:18px;">Pillpal</div>
+      <p style="margin:6px 0 0; color:var(--ink-2); font-size:14px;">A simple, private medication tracker. All your data lives on this device — nothing is sent anywhere.</p>
+      <p style="margin:10px 0 0; color:var(--ink-2); font-size:13px;">
+        <strong>On iPhone:</strong> add to your Home Screen for reminders to work in the background.<br>
+        <strong>On Android:</strong> install via the browser menu for the best experience.
+      </p>
+    </div>
+  `;
+
+  $('#theme-segment').querySelectorAll('.seg-opt').forEach((b) => {
+    b.addEventListener('click', () => {
+      settings.theme = b.dataset.v;
+      save(LS.settings, settings);
+      applyTheme();
+      renderSettings();
+    });
+  });
+
+  $('#toggle-notif').addEventListener('click', () => {
+    if (notifOn) {
+      settings.notifications = false; save(LS.settings, settings); renderSettings();
+      toast('Reminders paused');
+    } else { enableNotifications(); }
+  });
+  $('#test-notif').addEventListener('click', () => fireNotification('Test reminder', 'If you can read this, reminders are working.', 'test'));
+  $('#export-btn').addEventListener('click', exportData);
+  $('#import-btn').addEventListener('click', importData);
+  $('#clear-btn').addEventListener('click', () => {
+    openConfirmSheet({
+      title: 'Clear all data?',
+      body: 'This will delete every medication and dose record. This cannot be undone.',
+      confirmLabel: 'Yes, clear everything',
+      danger: true,
+      onConfirm: () => {
+        const savedTheme = settings.theme || 'auto';
+        localStorage.removeItem(LS.meds); localStorage.removeItem(LS.log);
+        localStorage.removeItem(LS.settings); localStorage.removeItem(LS.notified);
+        meds = []; log = []; settings = { notifications: false, dismissed: {}, theme: savedTheme }; notified = {};
+        save(LS.settings, settings);
+        applyTheme();
+        renderAll(); toast('All data cleared');
+      }
+    });
+  });
+}
+
+// --- Sheets ----------------------------------------------------------------
+function openSheet(html) {
+  const sheet = $('#sheet');
+  const bd = $('#sheet-backdrop');
+  sheet.innerHTML = `<div class="grabber"></div>${html}`;
+  bd.classList.add('open');
+  requestAnimationFrame(() => sheet.classList.add('open'));
+}
+function closeSheet() {
+  $('#sheet').classList.remove('open');
+  $('#sheet-backdrop').classList.remove('open');
+}
+$('#sheet-backdrop').addEventListener('click', closeSheet);
+
+// --- Add/Edit Med Form -----------------------------------------------------
+function openMedForm(existing) {
+  const m = existing || { id: uid(), name: '', dosage: '', times: ['08:00'], days: 'daily', color: 'coral', notes: '' };
+  const isNew = !existing;
+
+  openSheet(`
+    <h2>${isNew ? 'New medication' : 'Edit medication'}</h2>
+    <p class="lede">Set a name, dosage, and the times you take it.</p>
+
+    <label class="field">
+      <span class="lbl">Name</span>
+      <input class="input" id="f-name" placeholder="e.g. Vitamin D" value="${escapeAttr(m.name)}" autocomplete="off" />
+    </label>
+
+    <label class="field">
+      <span class="lbl">Dosage</span>
+      <input class="input" id="f-dosage" placeholder="e.g. 1 tablet, 500 mg" value="${escapeAttr(m.dosage)}" autocomplete="off" />
+    </label>
+
+    <div class="field">
+      <span class="lbl">Reminder times</span>
+      <div class="times-list" id="f-times"></div>
+      <button class="add-time" id="f-add-time">+ Add another time</button>
+    </div>
+
+    <div class="field">
+      <span class="lbl">Days</span>
+      <div class="row" style="margin-bottom:10px; gap:8px;">
+        <button class="day-chip ${m.days === 'daily' ? 'on' : ''}" id="f-daily" style="flex:1;">Every day</button>
+        <button class="day-chip ${m.days !== 'daily' ? 'on' : ''}" id="f-custom" style="flex:1;">Specific days</button>
+      </div>
+      <div class="day-chips" id="f-days" style="${m.days === 'daily' ? 'display:none;' : ''}"></div>
+    </div>
+
+    <div class="field">
+      <span class="lbl">Color</span>
+      <div class="swatches" id="f-swatches"></div>
+    </div>
+
+    <label class="field">
+      <span class="lbl">Notes (optional)</span>
+      <textarea class="input" id="f-notes" placeholder="e.g. Take with food">${escapeHTML(m.notes || '')}</textarea>
+    </label>
+
+    <button class="btn btn-primary" id="f-save">${isNew ? 'Add medication' : 'Save changes'}</button>
+    ${isNew ? '' : '<button class="btn btn-danger" id="f-delete" style="margin-top:8px;">Delete medication</button>'}
+    <button class="btn btn-ghost" id="f-cancel" style="margin-top:8px;">Cancel</button>
+  `);
+
+  // Times
+  let times = [...m.times];
+  function renderTimes() {
+    $('#f-times').innerHTML = times.map((t, i) => `
+      <div class="time-row">
+        <input type="time" value="${t}" data-i="${i}" />
+        ${times.length > 1 ? `<button class="remove-time" data-i="${i}" aria-label="Remove time">${ICON_TRASH}</button>` : ''}
+      </div>
+    `).join('');
+    $$('#f-times input[type=time]').forEach((inp) => {
+      inp.addEventListener('change', (e) => { times[+inp.dataset.i] = e.target.value; });
+    });
+    $$('#f-times .remove-time').forEach((b) => {
+      b.addEventListener('click', () => { times.splice(+b.dataset.i, 1); renderTimes(); });
+    });
+  }
+  renderTimes();
+  $('#f-add-time').addEventListener('click', () => { times.push('12:00'); renderTimes(); });
+
+  // Days
+  let days = m.days === 'daily' ? 'daily' : [...m.days];
+  function renderDayChips() {
+    const wrap = $('#f-days');
+    const names = ['S','M','T','W','T','F','S'];
+    wrap.innerHTML = names.map((n, i) => `<button class="day-chip ${Array.isArray(days) && days.includes(i) ? 'on' : ''}" data-d="${i}">${n}</button>`).join('');
+    wrap.querySelectorAll('.day-chip').forEach((b) => {
+      b.addEventListener('click', () => {
+        const d = +b.dataset.d;
+        if (!Array.isArray(days)) days = [];
+        const idx = days.indexOf(d);
+        if (idx === -1) days.push(d); else days.splice(idx, 1);
+        days.sort();
+        renderDayChips();
+      });
+    });
+  }
+  renderDayChips();
+
+  $('#f-daily').addEventListener('click', () => {
+    days = 'daily';
+    $('#f-daily').classList.add('on'); $('#f-custom').classList.remove('on');
+    $('#f-days').style.display = 'none';
+  });
+  $('#f-custom').addEventListener('click', () => {
+    if (days === 'daily') days = [1,2,3,4,5];
+    $('#f-custom').classList.add('on'); $('#f-daily').classList.remove('on');
+    $('#f-days').style.display = 'grid';
+    renderDayChips();
+  });
+
+  // Swatches
+  const swWrap = $('#f-swatches');
+  swWrap.innerHTML = PALETTE.map((p) => `
+    <div class="swatch ${p.id === m.color ? 'selected' : ''}" data-c="${p.id}" style="background:${p.bg}; color:${p.fg};">
+      ${ICON_CHECK}
+    </div>
+  `).join('');
+  let selColor = m.color;
+  swWrap.querySelectorAll('.swatch').forEach((s) => {
+    s.addEventListener('click', () => {
+      selColor = s.dataset.c;
+      swWrap.querySelectorAll('.swatch').forEach((x) => x.classList.toggle('selected', x.dataset.c === selColor));
+    });
+  });
+
+  // Save
+  $('#f-save').addEventListener('click', () => {
+    const name = $('#f-name').value.trim();
+    if (!name) { toast('Please enter a name'); return; }
+    if (times.length === 0) { toast('Add at least one time'); return; }
+    if (Array.isArray(days) && days.length === 0) { toast('Pick at least one day'); return; }
+    const updated = {
+      id: m.id, name,
+      dosage: $('#f-dosage').value.trim(),
+      times: [...new Set(times)].sort(),
+      days, color: selColor,
+      notes: $('#f-notes').value.trim(),
+      createdAt: m.createdAt || new Date().toISOString(),
+    };
+    const idx = meds.findIndex((x) => x.id === updated.id);
+    if (idx === -1) meds.push(updated); else meds[idx] = updated;
+    save(LS.meds, meds);
+    closeSheet();
+    toast(isNew ? 'Medication added' : 'Saved');
+    renderAll();
+    if (isNew && !settings.notifications && Notification.permission === 'default') {
+      // gentle nudge
+      setTimeout(() => { renderPermissionBanner(); }, 400);
+    }
+  });
+
+  $('#f-cancel').addEventListener('click', closeSheet);
+  if (!isNew) {
+    $('#f-delete').addEventListener('click', () => {
+      openConfirmSheet({
+        title: `Delete "${m.name}"?`,
+        body: 'This will also remove its dose history.',
+        confirmLabel: 'Delete',
+        danger: true,
+        onConfirm: () => {
+          meds = meds.filter((x) => x.id !== m.id);
+          log = log.filter((x) => x.medId !== m.id);
+          save(LS.meds, meds); save(LS.log, log);
+          closeSheet(); toast('Deleted'); renderAll();
+        }
+      });
+    });
+  }
+}
+
+function openMedDetail(id) {
+  const m = meds.find((x) => x.id === id);
+  if (!m) return;
+  const c = colorOf(m.color);
+  const sched = m.days === 'daily' ? 'Every day'
+    : m.days.map((d) => ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d]).join(', ');
+
+  openSheet(`
+    <div class="med-detail-hero">
+      <div class="big-pill" style="background:${c.bg}; color:${c.fg};">${ICON_PILL}</div>
+      <h3>${escapeHTML(m.name)}</h3>
+      <div class="sub">${escapeHTML(m.dosage || '')}</div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-2); margin-bottom:8px;">Schedule</div>
+      <div style="font-weight:600;">${sched}</div>
+      <div style="margin-top:6px; color:var(--ink-2); font-size:14px;">${m.times.map(fmtTime12).join(' · ')}</div>
+    </div>
+
+    ${m.notes ? `<div class="card"><div style="font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-2); margin-bottom:8px;">Notes</div><div>${escapeHTML(m.notes)}</div></div>` : ''}
+
+    <div style="margin-top:18px;">
+      <button class="btn btn-primary" id="d-edit">Edit medication</button>
+      <button class="btn btn-ghost" id="d-close" style="margin-top:8px;">Close</button>
+    </div>
+  `);
+  $('#d-edit').addEventListener('click', () => { closeSheet(); setTimeout(() => openMedForm(m), 300); });
+  $('#d-close').addEventListener('click', closeSheet);
+}
+
+function openDoseSheet(s) {
+  if (!s) return;
+  const c = colorOf(s.med.color);
+  openSheet(`
+    <div class="med-detail-hero">
+      <div class="big-pill" style="background:${c.bg}; color:${c.fg};">${ICON_PILL}</div>
+      <h3>${escapeHTML(s.med.name)}</h3>
+      <div class="sub">${escapeHTML(s.med.dosage || '')} · ${fmtTime12(s.time)}</div>
+    </div>
+    <div class="btn-row" style="flex-direction:column; gap:8px;">
+      <button class="btn btn-primary" id="ds-taken">${s.status === 'taken' ? 'Mark as not taken' : 'Mark as taken'}</button>
+      <button class="btn btn-ghost" id="ds-skip">${s.status === 'skipped' ? 'Unskip' : 'Skip this dose'}</button>
+      <button class="btn btn-ghost" id="ds-close">Close</button>
+    </div>
+  `);
+  $('#ds-taken').addEventListener('click', () => {
+    const ns = s.status === 'taken' ? 'pending' : 'taken';
+    markDose(s.medId, selectedDate, s.time, ns);
+    closeSheet(); renderAll();
+    toast(ns === 'taken' ? 'Nice — marked taken' : 'Updated');
+  });
+  $('#ds-skip').addEventListener('click', () => {
+    const ns = s.status === 'skipped' ? 'pending' : 'skipped';
+    markDose(s.medId, selectedDate, s.time, ns);
+    closeSheet(); renderAll();
+  });
+  $('#ds-close').addEventListener('click', closeSheet);
+}
+
+function openConfirmSheet({ title, body, confirmLabel, danger, onConfirm }) {
+  openSheet(`
+    <h2>${escapeHTML(title)}</h2>
+    <p class="lede">${escapeHTML(body)}</p>
+    <button class="btn ${danger ? 'btn-danger' : 'btn-primary'}" id="c-ok">${escapeHTML(confirmLabel)}</button>
+    <button class="btn btn-ghost" id="c-cancel" style="margin-top:8px;">Cancel</button>
+  `);
+  $('#c-ok').addEventListener('click', () => { closeSheet(); onConfirm(); });
+  $('#c-cancel').addEventListener('click', closeSheet);
+}
+
+// --- Notifications ---------------------------------------------------------
+async function enableNotifications() {
+  if (!('Notification' in window)) {
+    toast('Notifications not supported here');
+    return;
+  }
+  let perm = Notification.permission;
+  if (perm === 'default') {
+    try { perm = await Notification.requestPermission(); } catch { perm = 'denied'; }
+  }
+  if (perm === 'granted') {
+    settings.notifications = true; save(LS.settings, settings);
+    toast('Reminders are on');
+    fireNotification('Reminders enabled', "You'll get a gentle nudge at dose times.", 'enabled');
+  } else if (perm === 'denied') {
+    toast('Notifications were blocked');
+  }
+  renderAll();
+}
+
+function fireNotification(title, body, tag) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const opts = { body, tag, icon: 'icon-192.png', badge: 'icon-192.png' };
+  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({ type: 'NOTIFY', title, body, tag });
+  } else {
+    try { new Notification(title, opts); } catch (e) { /* ignore */ }
+  }
+}
+
+// Periodic check — fires notifications for doses due in the next minute
+function tickReminders() {
+  if (!settings.notifications || Notification.permission !== 'granted') return;
+  const now = new Date();
+  const dateKey = fmtDateKey(now);
+  for (const m of meds) {
+    if (!dosesForDay(m, now).length) continue;
+    for (const t of m.times) {
+      const [h, mm] = t.split(':').map(Number);
+      const due = new Date(now); due.setHours(h, mm, 0, 0);
+      const diff = (due - now) / 1000; // seconds
+      const key = `${m.id}|${dateKey}|${t}`;
+      // already notified
+      if (notified[key]) continue;
+      // already taken
+      const logEntry = log.find((l) => l.medId === m.id && l.scheduledISO === `${dateKey}T${t}:00`);
+      if (logEntry && logEntry.status !== 'pending') continue;
+      // fire when within 30s before to 60s after the scheduled time
+      if (diff <= 30 && diff >= -60) {
+        fireNotification(
+          `Time for ${m.name}`,
+          `${m.dosage || '1 dose'} · ${fmtTime12(t)}`,
+          key
+        );
+        notified[key] = Date.now();
+        save(LS.notified, notified);
+      }
+    }
+  }
+  // Garbage-collect notified entries older than 3 days
+  const cutoff = Date.now() - 3 * 86400000;
+  let changed = false;
+  for (const k of Object.keys(notified)) {
+    if (notified[k] < cutoff) { delete notified[k]; changed = true; }
+  }
+  if (changed) save(LS.notified, notified);
+}
+
+// --- Data: export / import / clear ----------------------------------------
+function exportData() {
+  const blob = new Blob([JSON.stringify({ meds, log, settings, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `pillpal-backup-${fmtDateKey(new Date())}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast('Backup downloaded');
+}
+function importData() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'application/json';
+  inp.addEventListener('change', async () => {
+    const f = inp.files[0]; if (!f) return;
+    try {
+      const text = await f.text();
+      const data = JSON.parse(text);
+      if (!Array.isArray(data.meds)) throw new Error('Invalid file');
+      meds = data.meds; log = Array.isArray(data.log) ? data.log : [];
+      if (data.settings) settings = { ...settings, ...data.settings };
+      save(LS.meds, meds); save(LS.log, log); save(LS.settings, settings);
+      toast('Backup restored'); applyTheme(); renderAll();
+    } catch (e) { toast('Could not read file'); }
+  });
+  inp.click();
+}
+
+// --- Tabs / navigation -----------------------------------------------------
+function setTab(name) {
+  $$('.view').forEach((v) => v.classList.remove('active'));
+  $('#view-' + name).classList.add('active');
+  $$('nav.tabs button').forEach((b) => b.classList.toggle('active', b.dataset.tab === name));
+  $('.fab').style.display = (name === 'today' || name === 'meds') ? 'grid' : 'none';
+  if (name === 'today') renderToday();
+  else if (name === 'meds') renderMeds();
+  else if (name === 'history') renderHistory();
+  else if (name === 'settings') renderSettings();
+}
+$$('nav.tabs button').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
+$('#open-settings').addEventListener('click', () => setTab('settings'));
+$('#fab-add').addEventListener('click', () => openMedForm(null));
+
+// --- Misc ------------------------------------------------------------------
+function renderAll() {
+  renderToday(); renderMeds(); renderHistory(); renderSettings();
+}
+
+let toastT;
+function toast(msg) {
+  const el = $('#toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function escapeHTML(s) {
+  return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function escapeAttr(s) { return escapeHTML(s); }
+
+// --- Service worker registration ------------------------------------------
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch((e) => console.warn('SW registration failed', e));
+  });
+}
+
+// --- Theme -----------------------------------------------------------------
+const darkMQ = window.matchMedia('(prefers-color-scheme: dark)');
+function applyTheme() {
+  const pref = settings.theme || 'auto';
+  const resolved = pref === 'auto' ? (darkMQ.matches ? 'dark' : 'light') : pref;
+  document.documentElement.dataset.theme = resolved;
+  // Sync the active meta theme-color so address-bar / iOS status overlay matches
+  const meta = document.querySelector('meta[name="theme-color"]:not([media])')
+    || document.createElement('meta');
+  meta.name = 'theme-color';
+  meta.content = resolved === 'dark' ? '#1A1614' : '#FAF6F0';
+  meta.removeAttribute('media');
+  if (!meta.parentNode) document.head.appendChild(meta);
+}
+darkMQ.addEventListener('change', () => {
+  if ((settings.theme || 'auto') === 'auto') applyTheme();
+});
+
+// --- Boot ------------------------------------------------------------------
+applyTheme();
+renderAll();
+tickReminders();
+setInterval(tickReminders, 30 * 1000);
+// Re-check when tab regains focus (catches missed ticks when app was backgrounded briefly)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) { renderToday(); tickReminders(); }
+});
+</script>
+</body>
+</html>
